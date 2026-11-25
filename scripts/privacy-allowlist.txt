@@ -1,0 +1,108 @@
+# Names the privacy gate lets through: public names every reader may see.
+# One a line. "host" allows that host and its subdomains; "=host" allows that one
+# name only; an address or a range (CIDR) allows addresses. Never put a name of
+# your own here to quiet the gate: this file is published.
+
+# Services Fleet talks to, or that its guides point at
+gridpane.com
+patchstack.com
+supabase.com
+cloudflare.com
+github.com
+nextjs.org
+opennext.js.org
+nodejs.org
+npmjs.com
+mozilla.org
+w3.org
+
+# Placeholders in guides and tests that are not in a reserved range
+=your-project.supabase.co
+=yourteam.cloudflareaccess.com
+=team.cloudflareaccess.com
+=example.cloudflareaccess.com
+=example.co
+=example.co.uk
+=mail.example.co.uk
+not-reserved.dev
+
+# Cloudflare's published address ranges (cloudflare.com/ips), used by the scripts
+# that lock a server's web ports to Cloudflare and by their tests
+173.245.48.0/20
+103.21.244.0/22
+103.22.200.0/22
+103.31.4.0/22
+141.101.64.0/18
+108.162.192.0/18
+190.93.240.0/20
+188.114.96.0/20
+197.234.240.0/22
+198.41.128.0/17
+162.158.0.0/15
+104.16.0.0/13
+104.24.0.0/14
+172.64.0.0/13
+131.0.72.0/22
+2400:cb00::
+2606:4700::
+2803:f800::
+2405:b500::
+2405:8100::
+2a06:98c0::
+2c0f:f248::
+
+# GridPane's own server addresses (<id>.gridpanevps.com): lib/opcache-status.ts tells them apart from client sites, so its test needs one. Only this made-up name is allowed: a real server's name under that domain is still flagged.
+=abc123.gridpanevps.com
+
+# The copyright holder named in LICENSE. Allowed in this one line, in this one file.
+in LICENSE: Copyright (c) 2026 Matchless Web Studio, LLC
+
+# GridPane's own hostname domain, as the scripts' comments write it ("<server>.gridpanevps.com",
+# "<server>stat.gridpanevps.com"). Exact names only, so a real server's name under it is still flagged.
+=gridpanevps.com
+=stat.gridpanevps.com
+
+# Apple's property-list document type, the first line of every launchd job file
+=www.apple.com
+
+# Cloudflare's public DNS resolver, asked by the script that locks web ports
+1.1.1.1
+
+# Not an address. The 7G firewall's log joins two rule names with two colons
+# ("bad_bot_2::bad_query_string_4"), and the middle of that reads like IPv6
+2::bad
+
+# Third-party platforms a site's front door can point at (site builders, registrar
+# parking pages, app hosts). scripts/waf-inventory.py names them to tell "a platform
+# fronts this site, by design" from "a server is exposed", and its tests use a few.
+# Exact names only, so a real site's own name under one of them is still flagged.
+=squarespace.com
+=ext-sq.squarespace.com
+=x.squarespace.com
+=notsquarespace.com
+=squarespace-cdn.com
+=wixdns.net
+=wixsite.com
+=myshopify.com
+=parkingpage.namecheap.com
+=registrar-servers.com
+=github.io
+=webflow.io
+=vercel-dns.com
+=ghost.io
+=kajabi.com
+=hubspotusercontent.net
+=wpenginepowered.com
+# Squarespace's four published apex addresses, the same for every site it hosts
+198.185.159.144
+198.185.159.145
+198.49.23.144
+198.49.23.145
+
+# The project's articles, linked from the README by the owner's choice. Each link, in that one file.
+in README.md: https://jonphillips.dev/posts/matchless-fleet-gridpane-dashboard
+in README.md: https://jonphillips.dev/posts/gridpane-firewall-fleet-7g-8g-cloudflare
+in README.md: https://jonphillips.dev/posts/8g-firewall-watch-mode-gridpane
+in README.md: https://jonphillips.dev/posts/7g-firewall-exception-generator
+in README.md: https://jonphillips.dev/posts/fail2ban-cloudflare-gridpane
+in README.md: https://jonphillips.dev/posts/gridpane-opcache

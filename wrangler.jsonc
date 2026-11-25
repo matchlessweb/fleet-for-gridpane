@@ -1,0 +1,26 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "fleet",
+  "main": ".open-next/worker.js",
+  // Serve the app at your custom domain only. The default *.workers.dev
+  // hostname serves the identical app, so leaving it on lets anyone with that
+  // address walk past a Cloudflare Access policy on the custom domain:
+  // protecting the front door while leaving the side door open.
+  "workers_dev": false,
+  "compatibility_date": "2025-08-01",
+  "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
+  "assets": {
+    "directory": ".open-next/assets",
+    "binding": "ASSETS"
+  },
+  "services": [
+    {
+      "binding": "WORKER_SELF_REFERENCE",
+      "service": "fleet"
+    }
+  ]
+  // Secrets (set once per environment, never committed):
+  //   npx wrangler secret put GRIDPANE_API_TOKEN
+  //   npx wrangler secret put SUPABASE_SERVICE_ROLE_KEY
+  // NEXT_PUBLIC_* values are inlined at build time from .env.local.
+}

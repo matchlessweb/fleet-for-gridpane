@@ -1,0 +1,262 @@
+@import "tailwindcss";
+
+/* ══════════════════════════════════════════════════════════════════
+   THE LEDGER — design tokens
+   Doctrine: docs/DESIGN.md. Editorial ops console: paper, ink,
+   hairline rules, numbers as typography. LIGHT-FIRST; dark mode is a
+   graphite plate inversion, not a mood change. Emerald is the single
+   accent; charts use the validated three-series trio.
+   ══════════════════════════════════════════════════════════════════ */
+
+@theme {
+  --font-sans: var(--font-geist), -apple-system, ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-jetbrains-mono), ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+
+  --color-panel: var(--panel);
+  --color-panel-2: var(--panel-2);
+  --color-sunken: var(--sunken);
+
+  --color-border: var(--border);
+  --color-line-strong: var(--line-strong);
+
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-faint: var(--faint);
+
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+
+  --color-warning: var(--warning);
+  --color-warning-foreground: var(--warning-foreground);
+  --color-danger: var(--danger);
+  --color-danger-foreground: var(--danger-foreground);
+
+  /* Status colors come in two weights. The plain token is the FILL: buttons,
+     dots, meters, rules, tints. As TEXT the same class takes the ink value,
+     which holds 4.5:1 on paper, on panel-2 and on its own 8 to 12% tint.
+     So `bg-primary` and `text-primary` are deliberately not the same green. */
+  --text-color-primary: var(--primary-ink);
+  --text-color-warning: var(--warning-ink);
+  --text-color-danger: var(--danger-ink);
+  /* The accent as a mark, not as text (the wordmark's dot). */
+  --color-brand: var(--primary);
+
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+
+  --color-on-sunken: var(--on-sunken);
+  --color-on-sunken-dim: var(--on-sunken-dim);
+
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
+}
+
+@custom-variant dark (&:is(.dark *));
+
+@layer base {
+  /* Paper (light, DEFAULT) */
+  :root {
+    --background: #FAFAF7;
+    --foreground: #141815;
+    --panel: #FFFFFF;
+    --panel-2: #F2F3EE;
+    --sunken: #101312; /* terminal wells stay ink-dark on paper */
+    --border: #E2E5DF;
+    --line-strong: #C9CEC6;
+    --muted: #EDEFE9;
+    --muted-foreground: #55605A;
+    --faint: #656F68; /* 4.5:1 on --muted, the darkest paper; #98A29B measured 2.63 on white */
+    --primary: #04845D; /* white on it is 4.70:1; #059669 measured 3.77 */
+    --primary-foreground: #FFFFFF;
+    --primary-ink: #046C4E;
+    --warning: #B45309;
+    --warning-foreground: #FFFFFF;
+    --warning-ink: #9A4708;
+    --danger: #DC2626;
+    --danger-foreground: #FFFFFF;
+    --danger-ink: #B91C1C;
+    --chart-1: #059669;
+    --chart-2: #2A78D6;
+    --chart-3: #C2417C;
+    /* ink for text set on --sunken; the well is dark in BOTH themes, so these
+       never flip — defined once here, inherited by .dark */
+    --on-sunken: #E8ECE9;
+    --on-sunken-dim: #98A29B;
+  }
+
+  /* Graphite plate (dark) */
+  .dark {
+    --background: #131614;
+    --foreground: #E8ECE9;
+    --panel: #191D1A;
+    --panel-2: #1F2420;
+    --sunken: #0D100E;
+    --border: #2A2F2B;
+    --line-strong: #3A403B;
+    --muted: #242923;
+    --muted-foreground: #A3ADA6;
+    --faint: #89938C; /* 4.66:1 on --muted; #6B756E measured 3.57 on --panel */
+    --primary: #10B981;
+    --primary-foreground: #06130D;
+    --primary-ink: #10B981;
+    --warning: #EDA33C;
+    --warning-foreground: #1A1005;
+    --warning-ink: #EDA33C;
+    --danger: #E84F54;
+    --danger-foreground: #1B0607; /* ink on the red, like the other two fills; white measured 3.70 */
+    --danger-ink: #EF6F73; /* 4.77:1 on its own tint; #E84F54 measured 3.77 there */
+    --chart-1: #0FA97A;
+    --chart-2: #3987E5;
+    --chart-3: #D55181;
+  }
+
+  /* The terminal well is ink-dark in BOTH themes, so text on it takes the
+     bright values whatever the theme. Without this the light theme's ink
+     greens and reds drop to 2.9:1 inside a well, and faint labels to 3.58.
+     The utility classes read the theme names (`--color-faint`,
+     `--text-color-primary`), and those were worked out once at the root, so
+     re-setting only `--faint` here changes nothing a class can see: both
+     sets are named. */
+  .bg-sunken {
+    --faint: #98A29B;
+    --primary-ink: #10B981;
+    --warning-ink: #EDA33C;
+    --danger-ink: #EF6F73;
+    --color-faint: #98A29B;
+    --text-color-primary: #10B981;
+    --text-color-warning: #EDA33C;
+    --text-color-danger: #EF6F73;
+  }
+
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: var(--color-border);
+  }
+
+  body {
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+    @apply antialiased;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
+  }
+
+  input[type="number"]::-webkit-inner-spin-button,
+  input[type="number"]::-webkit-outer-spin-button {
+    opacity: 1;
+    display: block;
+  }
+
+  /* iOS Safari force-zooms any focused field under 16px and never zooms back.
+     On touch devices every field renders at 16px regardless of its utility size. */
+  @media (pointer: coarse) {
+    input,
+    select,
+    textarea {
+      font-size: 16px !important;
+    }
+  }
+}
+
+/* ── motion (sparing — this is print, not neon) ──────────────────── */
+@keyframes lg-fade { from { opacity: 0; } }
+@keyframes lg-pop { from { opacity: 0; transform: translateY(4px); } }
+@keyframes lg-drawer { from { transform: translateX(100%); } }
+@keyframes lg-sheet { from { transform: translateY(100%); } }
+@keyframes lg-blink { 50% { opacity: 0.35; } }
+
+@utility anim-fade { animation: lg-fade 0.14s ease both; }
+@utility anim-pop { animation: lg-pop 0.16s ease both; }
+@utility anim-drawer { animation: lg-drawer 0.22s cubic-bezier(0.2, 0.8, 0.3, 1) both; }
+@utility anim-sheet { animation: lg-sheet 0.22s cubic-bezier(0.2, 0.8, 0.3, 1) both; }
+@utility anim-blink { animation: lg-blink 2.4s ease infinite; }
+
+/* touch-hit — expands the tap zone to ≥44px on coarse pointers without
+   changing the visual box. Pseudo-element hits target the host element,
+   so contains()-based outside-click logic keeps working. */
+@utility touch-hit {
+  @media (pointer: coarse) {
+    position: relative;
+    &::after {
+      content: "";
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: max(100%, 44px);
+      height: max(100%, 44px);
+      transform: translate(-50%, -50%);
+    }
+  }
+}
+
+@utility hide-scrollbar {
+  scrollbar-width: none;
+  &::-webkit-scrollbar { display: none; }
+}
+
+/* tab-label — a tab's text reserves its bold width, so the active tab going
+   bold never moves the labels beside it. The hidden copy is generated content:
+   not in the DOM text, not read aloud. */
+@utility tab-label {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: flex-start;
+  &::after {
+    content: attr(data-label);
+    height: 0;
+    overflow: hidden;
+    visibility: hidden;
+    font-weight: 700;
+    pointer-events: none;
+    user-select: none;
+  }
+}
+
+/* eyebrow — THE Ledger label idiom */
+@utility eyebrow {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+/* rulehead — section header with the ink rule */
+@utility rulehead {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  padding-bottom: 10px;
+  border-bottom: 2px solid var(--foreground);
+}
+
+/* Blanket rule: covers anim-*, animate-pulse/spin, Meter/health-ring
+   transitions, and anything added later. Near-zero (not zero) durations so
+   transitionend/animationend still fire for any code that awaits them. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  ::before,
+  ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Pop-up messages: the library's own success green measures 4.26:1 on its tint
+   in the light theme. Use the app's text green there instead (about 6:1). */
+html [data-sonner-toaster][data-sonner-theme="light"] {
+  --success-text: var(--primary-ink);
+}

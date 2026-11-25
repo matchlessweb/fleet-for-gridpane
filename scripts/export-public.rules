@@ -1,0 +1,59 @@
+# What a published copy leaves out. Read by scripts/export-public.sh (SETUP.md, step 12).
+#
+#   drop <path>                 leave this file or folder out
+#   use <example> as <path>     publish the example in place of your own file (the example is published too);
+#                               <path> need not exist in your repository, and its folder is made if it does not
+#   cut <path> <marker>         remove the block from the line holding BEGIN and <marker>
+#                               through the line holding END and <marker>
+#
+# Paths are inside the repository. # starts a comment.
+
+# Your own settings: a published copy gets the examples.
+use fleet.config.example.ts as fleet.config.ts
+use wrangler.example.jsonc as wrangler.jsonc
+
+# The checks GitHub runs on a published copy. GitHub runs a workflow only from
+# .github/workflows/, so where the example sits it is never run.
+use .github/ci.example.yml as .github/workflows/ci.yml
+use .github/linux.example.yml as .github/workflows/linux.yml
+
+# Files for your own team, if you keep any (a missing path is only noted).
+drop GEMINI.md
+cut AGENTS.md :multi-agent
+drop docs/prelaunch-auth-checklist.md
+
+# Earlier hand-applied database steps. supabase/migrations/ holds everything they
+# made, so a published copy leaves them out. sso_schema.sql stays: it is optional
+# and not in the migrations.
+drop agent_auth_schema.sql
+drop agent_auth_strict.sql
+drop app_settings_schema.sql
+drop cloudflare_waf_schema.sql
+drop fail2ban_schema.sql
+drop firewall_schema.sql
+drop opcache_schema.sql
+drop sites_url_not_unique.sql
+drop staging_schema.sql
+drop telemetry_schema.sql
+drop ufw_web_sources_schema.sql
+drop waf_schema.sql
+
+# Patchstack: your install's site, its read-only rules credential and the rules
+# Patchstack delivered for it stay with you. A published copy gets Patchstack's
+# own starter files, which run on bundled rules or on PATCHSTACK_SITE_UUID.
+use patchstack.next.ts.example as patchstack.next.ts
+use patchstack.rules.example.json as patchstack.rules.json
+drop .patchstackrc.json
+cut app/layout.tsx :patchstack-widget
+
+# Patchstack's install and build steps. Run in a copy with no .patchstackrc.json,
+# `patchstack-connect scan` makes a new Patchstack site and sends it the copy's
+# package list, so a stranger's first `npm install` would sign them up unasked.
+# The public copy runs none of them: its guard runs on the bundled rules and
+# sends nothing. Running `npx @patchstack/connect setup` adds the three back.
+#   drop-script <name>          leave this npm script out of package.json
+drop-script postinstall
+drop-script prebuild
+drop-script postbuild
+# app/layout.tsx keeps its #region patchstack stamp: it is a hash of the package
+# names and versions in package-lock.json, the same for anyone with this lockfile.

@@ -1,0 +1,129 @@
+# Checks for Fleet: every push to main and every pull request. GitHub runs it
+# only from .github/workflows/ci.yml; a repository that keeps it as
+# .github/ci.example.yml publishes it there with scripts/export-public.sh.
+#
+# Nothing here uses a secret, a real database, GridPane, Cloudflare or a server.
+# Every suite starts its own stand-ins and stops them.
+name: checks
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: checks-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: test (macOS, ${{ matrix.shard }}/4)
+    # The suites were written on a Mac and are proven there. Linux has its own
+    # workflow, started by hand (.github/workflows/linux.yml), until it passes.
+    runs-on: macos-latest
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix:
+        # One after another the suites take longer than a job may run on GitHub's
+        # runners, so they run in four parts side by side (scripts/ci-shard.mjs).
+        shard: [1, 2, 3, 4]
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+
+      # 22 is the oldest Node the scripts run on (`npm run doctor` asks for 22.6 or later).
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          cache: npm
+
+      # The single sign-on suites need OpenSSL 3. A Mac's own openssl is LibreSSL.
+      - name: OpenSSL 3
+        run: brew list openssl@3 >/dev/null 2>&1 || brew install openssl@3
+
+      # The OPcache suite starts two real php-fpm processes; the runner has no PHP. Only the
+      # part that runs that suite installs it. Without it the suite says SKIP and fails.
+      - name: PHP-FPM for the OPcache suite
+        run: |
+          if node scripts/ci-shard.mjs ${{ matrix.shard }} 4 | tr ' ' '\n' | grep -qx 'opcache:test'; then
+            brew list php >/dev/null 2>&1 || brew install php
+          fi
+
+      - run: npm ci
+
+      # Every script in package.json whose name ends in :test, `npm run doctor:test`
+      # among them, this job's quarter of them. A new suite is picked up without a change here.
+      - name: Test suites
+        run: |
+          failed=""
+          for suite in $(node scripts/ci-shard.mjs ${{ matrix.shard }} 4); do
+            echo "::group::npm run $suite"
+            npm run --silent "$suite" || failed="$failed $suite"
+            echo "::endgroup::"
+          done
+          if [ -n "$failed" ]; then echo "::error::These suites failed:$failed"; exit 1; fi
+
+  build:
+    # Once, on the system the suites were proven on: the type check, the
+    # end-to-end sign-in run, the privacy gate and the production build.
+    runs-on: macos-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: OpenSSL 3
+        run: brew list openssl@3 >/dev/null 2>&1 || brew install openssl@3
+
+      - run: npm ci
+
+      - name: Type check
+        run: npx tsc --noEmit -p .
+
+      # Every suite is in exactly one of the four test parts.
+      - name: Test split
+        run: node scripts/ci-shard.mjs --check 4
+
+      # One-click sign-in, end to end, against stand-ins it starts itself. Its
+      # controls take several minutes and are left to `npm run sso:e2e`.
+      - name: Single sign-on, end to end
+        run: node --experimental-strip-types --no-warnings scripts/test-sso-end-to-end.ts
+
+      # The built-in checks alone: addresses, hostnames, keys and ids that are not
+      # made-up values. Your own names need your own list, which never leaves your machine.
+      - name: Privacy gate
+        run: node scripts/privacy-gate.mjs --generic-only
+
+      # The build `npm run deploy` makes (Next.js, then the Worker bundle), without
+      # the deploy. It needs the two public Supabase settings to be set and no
+      # secret: these are placeholders, and the build must never need a real key.
+      - name: Production build
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: https://db.example.com
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: placeholder-not-a-real-key
+        run: npx opennextjs-cloudflare build
+
+  lint:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run lint

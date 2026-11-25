@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <!-- The Server grid mark: nine servers, one reporting in.
+       Master for every icon file; `npm run icons` rebuilds them all.
+       Drawn on a 32-unit grid (squares 6, gaps 2, margin 5) so the edges land
+       on whole pixels at 32, 64, 192 and 512.
+       Keep the two ids: the script squares off #tile and scales #art. -->
+  <rect id="tile" width="32" height="32" rx="7" fill="#131614"/>
+  <g id="art">
+    <g fill="#FAFAF7">
+      <rect x="5" y="5" width="6" height="6"/><rect x="13" y="5" width="6" height="6"/><rect x="21" y="5" width="6" height="6"/>
+      <rect x="5" y="13" width="6" height="6"/><rect x="13" y="13" width="6" height="6"/><rect x="21" y="13" width="6" height="6"/>
+      <rect x="5" y="21" width="6" height="6"/><rect x="13" y="21" width="6" height="6"/>
+    </g>
+    <rect x="21" y="21" width="6" height="6" fill="#10B981"/>
+  </g>
+</svg>

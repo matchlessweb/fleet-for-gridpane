@@ -1,0 +1,3582 @@
+{
+ "tables": [
+  {
+   "name": "app_settings",
+   "rls": true,
+   "rls_forced": false,
+   "comment": "Single-row (id = 1) fleet configuration. Currently telemetry warn/critical thresholds, read by lib/thresholds.ts.",
+   "columns": [
+    {
+     "name": "id",
+     "type": "bigint",
+     "not_null": true,
+     "default": "1",
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "cpu_warn",
+     "type": "numeric",
+     "not_null": true,
+     "default": "75",
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "cpu_critical",
+     "type": "numeric",
+     "not_null": true,
+     "default": "90",
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "memory_warn",
+     "type": "numeric",
+     "not_null": true,
+     "default": "75",
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "memory_critical",
+     "type": "numeric",
+     "not_null": true,
+     "default": "90",
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "disk_warn",
+     "type": "numeric",
+     "not_null": true,
+     "default": "75",
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "disk_critical",
+     "type": "numeric",
+     "not_null": true,
+     "default": "90",
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "updated_at",
+     "type": "timestamp with time zone",
+     "not_null": true,
+     "default": "now()",
+     "identity": "",
+     "generated": "",
+     "comment": null
+    }
+   ],
+   "constraints": [
+    {
+     "name": "app_settings_cpu_critical_check",
+     "type": "c",
+     "def": "CHECK (((cpu_critical >= (0)::numeric) AND (cpu_critical <= (100)::numeric)))"
+    },
+    {
+     "name": "app_settings_cpu_warn_check",
+     "type": "c",
+     "def": "CHECK (((cpu_warn >= (0)::numeric) AND (cpu_warn <= (100)::numeric)))"
+    },
+    {
+     "name": "app_settings_disk_critical_check",
+     "type": "c",
+     "def": "CHECK (((disk_critical >= (0)::numeric) AND (disk_critical <= (100)::numeric)))"
+    },
+    {
+     "name": "app_settings_disk_warn_check",
+     "type": "c",
+     "def": "CHECK (((disk_warn >= (0)::numeric) AND (disk_warn <= (100)::numeric)))"
+    },
+    {
+     "name": "app_settings_id_check",
+     "type": "c",
+     "def": "CHECK ((id = 1))"
+    },
+    {
+     "name": "app_settings_memory_critical_check",
+     "type": "c",
+     "def": "CHECK (((memory_critical >= (0)::numeric) AND (memory_critical <= (100)::numeric)))"
+    },
+    {
+     "name": "app_settings_memory_warn_check",
+     "type": "c",
+     "def": "CHECK (((memory_warn >= (0)::numeric) AND (memory_warn <= (100)::numeric)))"
+    },
+    {
+     "name": "app_settings_pkey",
+     "type": "p",
+     "def": "PRIMARY KEY (id)"
+    },
+    {
+     "name": "cpu_band",
+     "type": "c",
+     "def": "CHECK ((cpu_warn < cpu_critical))"
+    },
+    {
+     "name": "disk_band",
+     "type": "c",
+     "def": "CHECK ((disk_warn < disk_critical))"
+    },
+    {
+     "name": "memory_band",
+     "type": "c",
+     "def": "CHECK ((memory_warn < memory_critical))"
+    }
+   ],
+   "indexes": [],
+   "triggers": [],
+   "policies": [
+    {
+     "name": "app_settings authenticated all",
+     "cmd": "*",
+     "permissive": true,
+     "roles": [
+      "authenticated"
+     ],
+     "using": "true",
+     "check": "true"
+    }
+   ],
+   "grants": [
+    "anon:DELETE",
+    "anon:INSERT",
+    "anon:REFERENCES",
+    "anon:SELECT",
+    "anon:TRIGGER",
+    "anon:TRUNCATE",
+    "anon:UPDATE",
+    "authenticated:DELETE",
+    "authenticated:INSERT",
+    "authenticated:REFERENCES",
+    "authenticated:SELECT",
+    "authenticated:TRIGGER",
+    "authenticated:TRUNCATE",
+    "authenticated:UPDATE",
+    "service_role:DELETE",
+    "service_role:INSERT",
+    "service_role:REFERENCES",
+    "service_role:SELECT",
+    "service_role:TRIGGER",
+    "service_role:TRUNCATE",
+    "service_role:UPDATE"
+   ]
+  },
+  {
+   "name": "backup_history",
+   "rls": true,
+   "rls_forced": false,
+   "comment": null,
+   "columns": [
+    {
+     "name": "id",
+     "type": "uuid",
+     "not_null": true,
+     "default": "gen_random_uuid()",
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "schedule_id",
+     "type": "bigint",
+     "not_null": false,
+     "default": null,
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "site_id",
+     "type": "bigint",
+     "not_null": false,
+     "default": null,
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "server_id",
+     "type": "bigint",
+     "not_null": false,
+     "default": null,
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "started_at",
+     "type": "timestamp with time zone",
+     "not_null": false,
+     "default": "now()",
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "completed_at",
+     "type": "timestamp with time zone",
+     "not_null": false,
+     "default": null,
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "status",
+     "type": "text",
+     "not_null": true,
+     "default": null,
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "size_bytes",
+     "type": "bigint",
+     "not_null": false,
+     "default": "0",
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "storage_path",
+     "type": "text",
+     "not_null": false,
+     "default": null,
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "job_id",
+     "type": "text",
+     "not_null": false,
+     "default": null,
+     "identity": "",
+     "generated": "",
+     "comment": null
+    }
+   ],
+   "constraints": [
+    {
+     "name": "backup_history_pkey",
+     "type": "p",
+     "def": "PRIMARY KEY (id)"
+    },
+    {
+     "name": "backup_history_schedule_id_fkey",
+     "type": "f",
+     "def": "FOREIGN KEY (schedule_id) REFERENCES backup_schedules(id) ON DELETE SET NULL"
+    },
+    {
+     "name": "backup_history_server_id_fkey",
+     "type": "f",
+     "def": "FOREIGN KEY (server_id) REFERENCES servers(id) ON DELETE CASCADE"
+    },
+    {
+     "name": "backup_history_site_id_fkey",
+     "type": "f",
+     "def": "FOREIGN KEY (site_id) REFERENCES sites(id) ON DELETE CASCADE"
+    },
+    {
+     "name": "backup_history_status_check",
+     "type": "c",
+     "def": "CHECK ((status = ANY (ARRAY['success'::text, 'failed'::text, 'in_progress'::text])))"
+    }
+   ],
+   "indexes": [],
+   "triggers": [],
+   "policies": [
+    {
+     "name": "Enable read access for all users",
+     "cmd": "r",
+     "permissive": true,
+     "roles": [
+      "authenticated"
+     ],
+     "using": "true",
+     "check": null
+    }
+   ],
+   "grants": [
+    "anon:DELETE",
+    "anon:INSERT",
+    "anon:REFERENCES",
+    "anon:SELECT",
+    "anon:TRIGGER",
+    "anon:TRUNCATE",
+    "anon:UPDATE",
+    "authenticated:DELETE",
+    "authenticated:INSERT",
+    "authenticated:REFERENCES",
+    "authenticated:SELECT",
+    "authenticated:TRIGGER",
+    "authenticated:TRUNCATE",
+    "authenticated:UPDATE",
+    "service_role:DELETE",
+    "service_role:INSERT",
+    "service_role:REFERENCES",
+    "service_role:SELECT",
+    "service_role:TRIGGER",
+    "service_role:TRUNCATE",
+    "service_role:UPDATE"
+   ]
+  },
+  {
+   "name": "backup_schedules",
+   "rls": true,
+   "rls_forced": false,
+   "comment": null,
+   "columns": [
+    {
+     "name": "id",
+     "type": "bigint",
+     "not_null": true,
+     "default": null,
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "site_id",
+     "type": "bigint",
+     "not_null": false,
+     "default": null,
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "type",
+     "type": "text",
+     "not_null": false,
+     "default": null,
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "service_id",
+     "type": "bigint",
+     "not_null": false,
+     "default": null,
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "bup_schedule",
+     "type": "text",
+     "not_null": false,
+     "default": null,
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "hour",
+     "type": "text",
+     "not_null": false,
+     "default": null,
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "minute",
+     "type": "text",
+     "not_null": false,
+     "default": null,
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "day",
+     "type": "text",
+     "not_null": false,
+     "default": null,
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "created_at",
+     "type": "timestamp with time zone",
+     "not_null": false,
+     "default": null,
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "updated_at",
+     "type": "timestamp with time zone",
+     "not_null": false,
+     "default": null,
+     "identity": "",
+     "generated": "",
+     "comment": null
+    }
+   ],
+   "constraints": [
+    {
+     "name": "backup_schedules_pkey",
+     "type": "p",
+     "def": "PRIMARY KEY (id)"
+    },
+    {
+     "name": "backup_schedules_site_id_fkey",
+     "type": "f",
+     "def": "FOREIGN KEY (site_id) REFERENCES sites(id) ON DELETE CASCADE"
+    }
+   ],
+   "indexes": [],
+   "triggers": [],
+   "policies": [
+    {
+     "name": "backup_schedules authenticated write",
+     "cmd": "*",
+     "permissive": true,
+     "roles": [
+      "authenticated"
+     ],
+     "using": "true",
+     "check": "true"
+    },
+    {
+     "name": "Enable read access for authenticated users",
+     "cmd": "r",
+     "permissive": true,
+     "roles": [
+      "authenticated"
+     ],
+     "using": "true",
+     "check": null
+    }
+   ],
+   "grants": [
+    "anon:DELETE",
+    "anon:INSERT",
+    "anon:REFERENCES",
+    "anon:SELECT",
+    "anon:TRIGGER",
+    "anon:TRUNCATE",
+    "anon:UPDATE",
+    "authenticated:DELETE",
+    "authenticated:INSERT",
+    "authenticated:REFERENCES",
+    "authenticated:SELECT",
+    "authenticated:TRIGGER",
+    "authenticated:TRUNCATE",
+    "authenticated:UPDATE",
+    "service_role:DELETE",
+    "service_role:INSERT",
+    "service_role:REFERENCES",
+    "service_role:SELECT",
+    "service_role:TRIGGER",
+    "service_role:TRUNCATE",
+    "service_role:UPDATE"
+   ]
+  },
+  {
+   "name": "cloudflare_waf_runs",
+   "rls": true,
+   "rls_forced": false,
+   "comment": null,
+   "columns": [
+    {
+     "name": "id",
+     "type": "bigint",
+     "not_null": true,
+     "default": "nextval('cloudflare_waf_runs_id_seq'::regclass)",
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "report_sha256",
+     "type": "text",
+     "not_null": true,
+     "default": null,
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "run_dir",
+     "type": "text",
+     "not_null": true,
+     "default": null,
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "generated_at",
+     "type": "timestamp with time zone",
+     "not_null": true,
+     "default": null,
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "zone_count",
+     "type": "integer",
+     "not_null": true,
+     "default": null,
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "rule_count",
+     "type": "integer",
+     "not_null": true,
+     "default": null,
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "masked_count",
+     "type": "integer",
+     "not_null": true,
+     "default": null,
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "ingested_at",
+     "type": "timestamp with time zone",
+     "not_null": true,
+     "default": "now()",
+     "identity": "",
+     "generated": "",
+     "comment": null
+    }
+   ],
+   "constraints": [
+    {
+     "name": "cloudflare_waf_runs_pkey",
+     "type": "p",
+     "def": "PRIMARY KEY (id)"
+    },
+    {
+     "name": "cloudflare_waf_runs_report_sha256_key",
+     "type": "u",
+     "def": "UNIQUE (report_sha256)"
+    }
+   ],
+   "indexes": [],
+   "triggers": [],
+   "policies": [
+    {
+     "name": "cloudflare_waf_runs authenticated read",
+     "cmd": "r",
+     "permissive": true,
+     "roles": [
+      "authenticated"
+     ],
+     "using": "true",
+     "check": null
+    }
+   ],
+   "grants": [
+    "anon:DELETE",
+    "anon:INSERT",
+    "anon:REFERENCES",
+    "anon:SELECT",
+    "anon:TRIGGER",
+    "anon:TRUNCATE",
+    "anon:UPDATE",
+    "authenticated:DELETE",
+    "authenticated:INSERT",
+    "authenticated:REFERENCES",
+    "authenticated:SELECT",
+    "authenticated:TRIGGER",
+    "authenticated:TRUNCATE",
+    "authenticated:UPDATE",
+    "service_role:DELETE",
+    "service_role:INSERT",
+    "service_role:REFERENCES",
+    "service_role:SELECT",
+    "service_role:TRIGGER",
+    "service_role:TRUNCATE",
+    "service_role:UPDATE"
+   ]
+  },
+  {
+   "name": "cloudflare_zones",
+   "rls": true,
+   "rls_forced": false,
+   "comment": null,
+   "columns": [
+    {
+     "name": "zone_id",
+     "type": "text",
+     "not_null": true,
+     "default": null,
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "name",
+     "type": "text",
+     "not_null": true,
+     "default": null,
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "run_id",
+     "type": "bigint",
+     "not_null": true,
+     "default": null,
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "plan",
+     "type": "text",
+     "not_null": false,
+     "default": null,
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "account",
+     "type": "text",
+     "not_null": false,
+     "default": null,
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "paused",
+     "type": "boolean",
+     "not_null": true,
+     "default": "false",
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "nrules",
+     "type": "integer",
+     "not_null": true,
+     "default": "0",
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "ratelimit_rules",
+     "type": "integer",
+     "not_null": true,
+     "default": "0",
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "ruleset_version",
+     "type": "text",
+     "not_null": false,
+     "default": null,
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "ruleset_updated",
+     "type": "date",
+     "not_null": false,
+     "default": null,
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "profile",
+     "type": "text",
+     "not_null": false,
+     "default": null,
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "nearest",
+     "type": "text",
+     "not_null": false,
+     "default": null,
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "klass",
+     "type": "text",
+     "not_null": true,
+     "default": null,
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "comparable",
+     "type": "boolean",
+     "not_null": false,
+     "default": null,
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "core_fp",
+     "type": "text",
+     "not_null": false,
+     "default": null,
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "rule_order",
+     "type": "jsonb",
+     "not_null": true,
+     "default": "'[]'::jsonb",
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "order_matches",
+     "type": "boolean",
+     "not_null": false,
+     "default": null,
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "findings",
+     "type": "jsonb",
+     "not_null": true,
+     "default": "'[]'::jsonb",
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "reach",
+     "type": "jsonb",
+     "not_null": true,
+     "default": "'{}'::jsonb",
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "rules",
+     "type": "jsonb",
+     "not_null": true,
+     "default": "'[]'::jsonb",
+     "identity": "",
+     "generated": "",
+     "comment": null
+    }
+   ],
+   "constraints": [
+    {
+     "name": "cloudflare_zones_name_key",
+     "type": "u",
+     "def": "UNIQUE (name)"
+    },
+    {
+     "name": "cloudflare_zones_pkey",
+     "type": "p",
+     "def": "PRIMARY KEY (zone_id)"
+    },
+    {
+     "name": "cloudflare_zones_run_id_fkey",
+     "type": "f",
+     "def": "FOREIGN KEY (run_id) REFERENCES cloudflare_waf_runs(id)"
+    }
+   ],
+   "indexes": [
+    {
+     "name": "cloudflare_zones_klass_idx",
+     "def": "CREATE INDEX cloudflare_zones_klass_idx ON public.cloudflare_zones USING btree (klass)"
+    }
+   ],
+   "triggers": [],
+   "policies": [
+    {
+     "name": "cloudflare_zones authenticated read",
+     "cmd": "r",
+     "permissive": true,
+     "roles": [
+      "authenticated"
+     ],
+     "using": "true",
+     "check": null
+    }
+   ],
+   "grants": [
+    "anon:DELETE",
+    "anon:INSERT",
+    "anon:REFERENCES",
+    "anon:SELECT",
+    "anon:TRIGGER",
+    "anon:TRUNCATE",
+    "anon:UPDATE",
+    "authenticated:DELETE",
+    "authenticated:INSERT",
+    "authenticated:REFERENCES",
+    "authenticated:SELECT",
+    "authenticated:TRIGGER",
+    "authenticated:TRUNCATE",
+    "authenticated:UPDATE",
+    "service_role:DELETE",
+    "service_role:INSERT",
+    "service_role:REFERENCES",
+    "service_role:SELECT",
+    "service_role:TRIGGER",
+    "service_role:TRUNCATE",
+    "service_role:UPDATE"
+   ]
+  },
+  {
+   "name": "fail2ban_events",
+   "rls": true,
+   "rls_forced": false,
+   "comment": null,
+   "columns": [
+    {
+     "name": "id",
+     "type": "bigint",
+     "not_null": true,
+     "default": "nextval('fail2ban_events_id_seq'::regclass)",
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "server_id",
+     "type": "bigint",
+     "not_null": true,
+     "default": null,
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "site",
+     "type": "text",
+     "not_null": false,
+     "default": null,
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "jail",
+     "type": "text",
+     "not_null": true,
+     "default": null,
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "ip",
+     "type": "text",
+     "not_null": true,
+     "default": null,
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "event",
+     "type": "text",
+     "not_null": true,
+     "default": null,
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "at",
+     "type": "timestamp with time zone",
+     "not_null": true,
+     "default": "now()",
+     "identity": "",
+     "generated": "",
+     "comment": null
+    }
+   ],
+   "constraints": [
+    {
+     "name": "fail2ban_events_pkey",
+     "type": "p",
+     "def": "PRIMARY KEY (id)"
+    }
+   ],
+   "indexes": [
+    {
+     "name": "fail2ban_events_server_at_idx",
+     "def": "CREATE INDEX fail2ban_events_server_at_idx ON public.fail2ban_events USING btree (server_id, at DESC)"
+    },
+    {
+     "name": "fail2ban_events_site_idx",
+     "def": "CREATE INDEX fail2ban_events_site_idx ON public.fail2ban_events USING btree (server_id, site, at DESC)"
+    }
+   ],
+   "triggers": [],
+   "policies": [
+    {
+     "name": "fail2ban_events authenticated read",
+     "cmd": "r",
+     "permissive": true,
+     "roles": [
+      "authenticated"
+     ],
+     "using": "true",
+     "check": null
+    }
+   ],
+   "grants": [
+    "authenticated:DELETE",
+    "authenticated:INSERT",
+    "authenticated:REFERENCES",
+    "authenticated:SELECT",
+    "authenticated:TRIGGER",
+    "authenticated:TRUNCATE",
+    "authenticated:UPDATE",
+    "service_role:DELETE",
+    "service_role:INSERT",
+    "service_role:REFERENCES",
+    "service_role:SELECT",
+    "service_role:TRIGGER",
+    "service_role:TRUNCATE",
+    "service_role:UPDATE"
+   ]
+  },
+  {
+   "name": "ip_allowlist",
+   "rls": true,
+   "rls_forced": false,
+   "comment": null,
+   "columns": [
+    {
+     "name": "id",
+     "type": "bigint",
+     "not_null": true,
+     "default": "nextval('ip_allowlist_id_seq'::regclass)",
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "ip",
+     "type": "text",
+     "not_null": true,
+     "default": null,
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "label",
+     "type": "text",
+     "not_null": true,
+     "default": null,
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "scope",
+     "type": "text",
+     "not_null": true,
+     "default": "'global'::text",
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "server_id",
+     "type": "bigint",
+     "not_null": false,
+     "default": null,
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "site_id",
+     "type": "bigint",
+     "not_null": false,
+     "default": null,
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "layers",
+     "type": "text[]",
+     "not_null": true,
+     "default": "'{}'::text[]",
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "note",
+     "type": "text",
+     "not_null": false,
+     "default": null,
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "created_at",
+     "type": "timestamp with time zone",
+     "not_null": true,
+     "default": "now()",
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "removed_at",
+     "type": "timestamp with time zone",
+     "not_null": false,
+     "default": null,
+     "identity": "",
+     "generated": "",
+     "comment": null
+    }
+   ],
+   "constraints": [
+    {
+     "name": "ip_allowlist_pkey",
+     "type": "p",
+     "def": "PRIMARY KEY (id)"
+    }
+   ],
+   "indexes": [
+    {
+     "name": "ip_allowlist_scope_idx",
+     "def": "CREATE INDEX ip_allowlist_scope_idx ON public.ip_allowlist USING btree (scope) WHERE (removed_at IS NULL)"
+    },
+    {
+     "name": "ip_allowlist_server_idx",
+     "def": "CREATE INDEX ip_allowlist_server_idx ON public.ip_allowlist USING btree (server_id) WHERE (removed_at IS NULL)"
+    },
+    {
+     "name": "ip_allowlist_site_idx",
+     "def": "CREATE INDEX ip_allowlist_site_idx ON public.ip_allowlist USING btree (site_id) WHERE (removed_at IS NULL)"
+    }
+   ],
+   "triggers": [],
+   "policies": [
+    {
+     "name": "ip_allowlist authenticated all",
+     "cmd": "*",
+     "permissive": true,
+     "roles": [
+      "authenticated"
+     ],
+     "using": "true",
+     "check": "true"
+    }
+   ],
+   "grants": [
+    "anon:DELETE",
+    "anon:INSERT",
+    "anon:REFERENCES",
+    "anon:SELECT",
+    "anon:TRIGGER",
+    "anon:TRUNCATE",
+    "anon:UPDATE",
+    "authenticated:DELETE",
+    "authenticated:INSERT",
+    "authenticated:REFERENCES",
+    "authenticated:SELECT",
+    "authenticated:TRIGGER",
+    "authenticated:TRUNCATE",
+    "authenticated:UPDATE",
+    "service_role:DELETE",
+    "service_role:INSERT",
+    "service_role:REFERENCES",
+    "service_role:SELECT",
+    "service_role:TRIGGER",
+    "service_role:TRUNCATE",
+    "service_role:UPDATE"
+   ]
+  },
+  {
+   "name": "ip_blocks",
+   "rls": true,
+   "rls_forced": false,
+   "comment": null,
+   "columns": [
+    {
+     "name": "id",
+     "type": "bigint",
+     "not_null": true,
+     "default": "nextval('ip_blocks_id_seq'::regclass)",
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "ip",
+     "type": "text",
+     "not_null": true,
+     "default": null,
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "layer",
+     "type": "text",
+     "not_null": true,
+     "default": null,
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "scope",
+     "type": "text",
+     "not_null": true,
+     "default": null,
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "server_id",
+     "type": "bigint",
+     "not_null": false,
+     "default": null,
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "site_id",
+     "type": "bigint",
+     "not_null": false,
+     "default": null,
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "reason",
+     "type": "text",
+     "not_null": false,
+     "default": null,
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "created_at",
+     "type": "timestamp with time zone",
+     "not_null": true,
+     "default": "now()",
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "applied_at",
+     "type": "timestamp with time zone",
+     "not_null": false,
+     "default": null,
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "removed_at",
+     "type": "timestamp with time zone",
+     "not_null": false,
+     "default": null,
+     "identity": "",
+     "generated": "",
+     "comment": null
+    }
+   ],
+   "constraints": [
+    {
+     "name": "ip_blocks_layer_check",
+     "type": "c",
+     "def": "CHECK ((layer = ANY (ARRAY['ufw'::text, 'nginx'::text, 'cloudflare'::text])))"
+    },
+    {
+     "name": "ip_blocks_pkey",
+     "type": "p",
+     "def": "PRIMARY KEY (id)"
+    },
+    {
+     "name": "ip_blocks_scope_check",
+     "type": "c",
+     "def": "CHECK ((scope = ANY (ARRAY['server'::text, 'site'::text])))"
+    },
+    {
+     "name": "ip_blocks_server_id_fkey",
+     "type": "f",
+     "def": "FOREIGN KEY (server_id) REFERENCES servers(id) ON DELETE CASCADE"
+    },
+    {
+     "name": "ip_blocks_site_id_fkey",
+     "type": "f",
+     "def": "FOREIGN KEY (site_id) REFERENCES sites(id) ON DELETE CASCADE"
+    },
+    {
+     "name": "ip_blocks_target_ck",
+     "type": "c",
+     "def": "CHECK ((((scope = 'server'::text) AND (server_id IS NOT NULL)) OR ((scope = 'site'::text) AND (site_id IS NOT NULL))))"
+    }
+   ],
+   "indexes": [
+    {
+     "name": "idx_ip_blocks_created",
+     "def": "CREATE INDEX idx_ip_blocks_created ON public.ip_blocks USING btree (created_at DESC)"
+    },
+    {
+     "name": "idx_ip_blocks_server",
+     "def": "CREATE INDEX idx_ip_blocks_server ON public.ip_blocks USING btree (server_id) WHERE (removed_at IS NULL)"
+    },
+    {
+     "name": "idx_ip_blocks_site",
+     "def": "CREATE INDEX idx_ip_blocks_site ON public.ip_blocks USING btree (site_id) WHERE (removed_at IS NULL)"
+    }
+   ],
+   "triggers": [],
+   "policies": [
+    {
+     "name": "ip_blocks authenticated all",
+     "cmd": "*",
+     "permissive": true,
+     "roles": [
+      "authenticated"
+     ],
+     "using": "true",
+     "check": "true"
+    }
+   ],
+   "grants": [
+    "anon:DELETE",
+    "anon:INSERT",
+    "anon:REFERENCES",
+    "anon:SELECT",
+    "anon:TRIGGER",
+    "anon:TRUNCATE",
+    "anon:UPDATE",
+    "authenticated:DELETE",
+    "authenticated:INSERT",
+    "authenticated:REFERENCES",
+    "authenticated:SELECT",
+    "authenticated:TRIGGER",
+    "authenticated:TRUNCATE",
+    "authenticated:UPDATE",
+    "service_role:DELETE",
+    "service_role:INSERT",
+    "service_role:REFERENCES",
+    "service_role:SELECT",
+    "service_role:TRIGGER",
+    "service_role:TRUNCATE",
+    "service_role:UPDATE"
+   ]
+  },
+  {
+   "name": "php_opcache_state",
+   "rls": true,
+   "rls_forced": false,
+   "comment": null,
+   "columns": [
+    {
+     "name": "server_id",
+     "type": "bigint",
+     "not_null": true,
+     "default": null,
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "php_version",
+     "type": "text",
+     "not_null": true,
+     "default": null,
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "reported_at",
+     "type": "timestamp with time zone",
+     "not_null": true,
+     "default": "now()",
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "pools",
+     "type": "integer",
+     "not_null": true,
+     "default": "0",
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "sites",
+     "type": "jsonb",
+     "not_null": true,
+     "default": "'[]'::jsonb",
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "ini",
+     "type": "jsonb",
+     "not_null": false,
+     "default": null,
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "live",
+     "type": "jsonb",
+     "not_null": false,
+     "default": null,
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "live_error",
+     "type": "text",
+     "not_null": false,
+     "default": null,
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "prev",
+     "type": "jsonb",
+     "not_null": false,
+     "default": null,
+     "identity": "",
+     "generated": "",
+     "comment": null
+    }
+   ],
+   "constraints": [
+    {
+     "name": "php_opcache_state_pkey",
+     "type": "p",
+     "def": "PRIMARY KEY (server_id, php_version)"
+    }
+   ],
+   "indexes": [],
+   "triggers": [],
+   "policies": [
+    {
+     "name": "php_opcache_state authenticated read",
+     "cmd": "r",
+     "permissive": true,
+     "roles": [
+      "authenticated"
+     ],
+     "using": "true",
+     "check": null
+    }
+   ],
+   "grants": [
+    "authenticated:DELETE",
+    "authenticated:INSERT",
+    "authenticated:REFERENCES",
+    "authenticated:SELECT",
+    "authenticated:TRIGGER",
+    "authenticated:TRUNCATE",
+    "authenticated:UPDATE",
+    "service_role:DELETE",
+    "service_role:INSERT",
+    "service_role:REFERENCES",
+    "service_role:SELECT",
+    "service_role:TRIGGER",
+    "service_role:TRUNCATE",
+    "service_role:UPDATE"
+   ]
+  },
+  {
+   "name": "server_agent_secrets",
+   "rls": true,
+   "rls_forced": false,
+   "comment": "SHA-256 hashes of per-server agent tokens. Never readable by anon or authenticated — RLS is on with no policies by design.",
+   "columns": [
+    {
+     "name": "server_id",
+     "type": "bigint",
+     "not_null": true,
+     "default": null,
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "token_hash",
+     "type": "text",
+     "not_null": true,
+     "default": null,
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "created_at",
+     "type": "timestamp with time zone",
+     "not_null": true,
+     "default": "now()",
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "last_used_at",
+     "type": "timestamp with time zone",
+     "not_null": false,
+     "default": null,
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "rotated_at",
+     "type": "timestamp with time zone",
+     "not_null": false,
+     "default": null,
+     "identity": "",
+     "generated": "",
+     "comment": null
+    }
+   ],
+   "constraints": [
+    {
+     "name": "server_agent_secrets_pkey",
+     "type": "p",
+     "def": "PRIMARY KEY (server_id)"
+    }
+   ],
+   "indexes": [],
+   "triggers": [],
+   "policies": [],
+   "grants": [
+    "service_role:DELETE",
+    "service_role:INSERT",
+    "service_role:REFERENCES",
+    "service_role:SELECT",
+    "service_role:TRIGGER",
+    "service_role:TRUNCATE",
+    "service_role:UPDATE"
+   ]
+  },
+  {
+   "name": "server_fail2ban_state",
+   "rls": true,
+   "rls_forced": false,
+   "comment": null,
+   "columns": [
+    {
+     "name": "server_id",
+     "type": "bigint",
+     "not_null": true,
+     "default": null,
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "reported_at",
+     "type": "timestamp with time zone",
+     "not_null": true,
+     "default": "now()",
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "agent_format",
+     "type": "integer",
+     "not_null": true,
+     "default": "1",
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "fail2ban_present",
+     "type": "boolean",
+     "not_null": true,
+     "default": null,
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "fail2ban_running",
+     "type": "boolean",
+     "not_null": true,
+     "default": null,
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "fail2ban_version",
+     "type": "text",
+     "not_null": false,
+     "default": null,
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "token_file_present",
+     "type": "boolean",
+     "not_null": true,
+     "default": null,
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "gpcloudflare_conf",
+     "type": "boolean",
+     "not_null": true,
+     "default": null,
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "auth_log_readable",
+     "type": "boolean",
+     "not_null": true,
+     "default": null,
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "server_jails",
+     "type": "jsonb",
+     "not_null": true,
+     "default": "'[]'::jsonb",
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "orphan_jails",
+     "type": "jsonb",
+     "not_null": true,
+     "default": "'[]'::jsonb",
+     "identity": "",
+     "generated": "",
+     "comment": null
+    }
+   ],
+   "constraints": [
+    {
+     "name": "server_fail2ban_state_pkey",
+     "type": "p",
+     "def": "PRIMARY KEY (server_id)"
+    }
+   ],
+   "indexes": [],
+   "triggers": [],
+   "policies": [
+    {
+     "name": "server_fail2ban_state authenticated read",
+     "cmd": "r",
+     "permissive": true,
+     "roles": [
+      "authenticated"
+     ],
+     "using": "true",
+     "check": null
+    }
+   ],
+   "grants": [
+    "authenticated:DELETE",
+    "authenticated:INSERT",
+    "authenticated:REFERENCES",
+    "authenticated:SELECT",
+    "authenticated:TRIGGER",
+    "authenticated:TRUNCATE",
+    "authenticated:UPDATE",
+    "service_role:DELETE",
+    "service_role:INSERT",
+    "service_role:REFERENCES",
+    "service_role:SELECT",
+    "service_role:TRIGGER",
+    "service_role:TRUNCATE",
+    "service_role:UPDATE"
+   ]
+  },
+  {
+   "name": "server_firewall_state",
+   "rls": true,
+   "rls_forced": false,
+   "comment": null,
+   "columns": [
+    {
+     "name": "server_id",
+     "type": "bigint",
+     "not_null": true,
+     "default": null,
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "reported_at",
+     "type": "timestamp with time zone",
+     "not_null": true,
+     "default": "now()",
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "ufw_enabled",
+     "type": "boolean",
+     "not_null": false,
+     "default": null,
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "ufw_denied_ips",
+     "type": "text[]",
+     "not_null": true,
+     "default": "'{}'::text[]",
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "nginx_denies",
+     "type": "jsonb",
+     "not_null": true,
+     "default": "'{}'::jsonb",
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "ufw_allowed_ips",
+     "type": "text[]",
+     "not_null": false,
+     "default": null,
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "fail2ban_ignoreip",
+     "type": "text[]",
+     "not_null": false,
+     "default": null,
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "fail2ban_banned",
+     "type": "jsonb",
+     "not_null": false,
+     "default": null,
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "fail2ban_present",
+     "type": "boolean",
+     "not_null": false,
+     "default": null,
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "ufw_web_sources",
+     "type": "text[]",
+     "not_null": false,
+     "default": null,
+     "identity": "",
+     "generated": "",
+     "comment": null
+    }
+   ],
+   "constraints": [
+    {
+     "name": "server_firewall_state_pkey",
+     "type": "p",
+     "def": "PRIMARY KEY (server_id)"
+    },
+    {
+     "name": "server_firewall_state_server_id_fkey",
+     "type": "f",
+     "def": "FOREIGN KEY (server_id) REFERENCES servers(id) ON DELETE CASCADE"
+    }
+   ],
+   "indexes": [],
+   "triggers": [],
+   "policies": [
+    {
+     "name": "firewall_state authenticated read",
+     "cmd": "r",
+     "permissive": true,
+     "roles": [
+      "authenticated"
+     ],
+     "using": "true",
+     "check": null
+    }
+   ],
+   "grants": [
+    "anon:DELETE",
+    "anon:INSERT",
+    "anon:REFERENCES",
+    "anon:SELECT",
+    "anon:TRIGGER",
+    "anon:TRUNCATE",
+    "anon:UPDATE",
+    "authenticated:DELETE",
+    "authenticated:INSERT",
+    "authenticated:REFERENCES",
+    "authenticated:SELECT",
+    "authenticated:TRIGGER",
+    "authenticated:TRUNCATE",
+    "authenticated:UPDATE",
+    "service_role:DELETE",
+    "service_role:INSERT",
+    "service_role:REFERENCES",
+    "service_role:SELECT",
+    "service_role:TRIGGER",
+    "service_role:TRUNCATE",
+    "service_role:UPDATE"
+   ]
+  },
+  {
+   "name": "server_hardware",
+   "rls": true,
+   "rls_forced": false,
+   "comment": null,
+   "columns": [
+    {
+     "name": "server_id",
+     "type": "bigint",
+     "not_null": true,
+     "default": null,
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "cpu_cores",
+     "type": "integer",
+     "not_null": false,
+     "default": null,
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "ram_total_mb",
+     "type": "integer",
+     "not_null": false,
+     "default": null,
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "vendor",
+     "type": "text",
+     "not_null": false,
+     "default": null,
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "product",
+     "type": "text",
+     "not_null": false,
+     "default": null,
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "reported_at",
+     "type": "timestamp with time zone",
+     "not_null": true,
+     "default": "now()",
+     "identity": "",
+     "generated": "",
+     "comment": null
+    }
+   ],
+   "constraints": [
+    {
+     "name": "server_hardware_pkey",
+     "type": "p",
+     "def": "PRIMARY KEY (server_id)"
+    }
+   ],
+   "indexes": [],
+   "triggers": [],
+   "policies": [
+    {
+     "name": "read server hardware",
+     "cmd": "r",
+     "permissive": true,
+     "roles": [
+      "authenticated"
+     ],
+     "using": "true",
+     "check": null
+    }
+   ],
+   "grants": [
+    "anon:DELETE",
+    "anon:INSERT",
+    "anon:REFERENCES",
+    "anon:SELECT",
+    "anon:TRIGGER",
+    "anon:TRUNCATE",
+    "anon:UPDATE",
+    "authenticated:DELETE",
+    "authenticated:INSERT",
+    "authenticated:REFERENCES",
+    "authenticated:SELECT",
+    "authenticated:TRIGGER",
+    "authenticated:TRUNCATE",
+    "authenticated:UPDATE",
+    "service_role:DELETE",
+    "service_role:INSERT",
+    "service_role:REFERENCES",
+    "service_role:SELECT",
+    "service_role:TRIGGER",
+    "service_role:TRUNCATE",
+    "service_role:UPDATE"
+   ]
+  },
+  {
+   "name": "server_opcache_state",
+   "rls": true,
+   "rls_forced": false,
+   "comment": null,
+   "columns": [
+    {
+     "name": "server_id",
+     "type": "bigint",
+     "not_null": true,
+     "default": null,
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "reported_at",
+     "type": "timestamp with time zone",
+     "not_null": true,
+     "default": "now()",
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "agent_format",
+     "type": "integer",
+     "not_null": true,
+     "default": "1",
+     "identity": "",
+     "generated": "",
+     "comment": null
+    }
+   ],
+   "constraints": [
+    {
+     "name": "server_opcache_state_pkey",
+     "type": "p",
+     "def": "PRIMARY KEY (server_id)"
+    }
+   ],
+   "indexes": [],
+   "triggers": [],
+   "policies": [
+    {
+     "name": "server_opcache_state authenticated read",
+     "cmd": "r",
+     "permissive": true,
+     "roles": [
+      "authenticated"
+     ],
+     "using": "true",
+     "check": null
+    }
+   ],
+   "grants": [
+    "authenticated:DELETE",
+    "authenticated:INSERT",
+    "authenticated:REFERENCES",
+    "authenticated:SELECT",
+    "authenticated:TRIGGER",
+    "authenticated:TRUNCATE",
+    "authenticated:UPDATE",
+    "service_role:DELETE",
+    "service_role:INSERT",
+    "service_role:REFERENCES",
+    "service_role:SELECT",
+    "service_role:TRIGGER",
+    "service_role:TRUNCATE",
+    "service_role:UPDATE"
+   ]
+  },
+  {
+   "name": "server_telemetry",
+   "rls": true,
+   "rls_forced": false,
+   "comment": null,
+   "columns": [
+    {
+     "name": "id",
+     "type": "bigint",
+     "not_null": true,
+     "default": null,
+     "identity": "d",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "server_id",
+     "type": "bigint",
+     "not_null": true,
+     "default": null,
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "cpu_usage",
+     "type": "numeric(5,2)",
+     "not_null": true,
+     "default": null,
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "ram_usage",
+     "type": "numeric(5,2)",
+     "not_null": true,
+     "default": null,
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "disk_usage",
+     "type": "numeric(5,2)",
+     "not_null": true,
+     "default": null,
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "timestamp",
+     "type": "timestamp with time zone",
+     "not_null": true,
+     "default": "now()",
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "disk_total_gb",
+     "type": "numeric",
+     "not_null": false,
+     "default": null,
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "disk_www_mb",
+     "type": "numeric",
+     "not_null": false,
+     "default": null,
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "disk_mysql_mb",
+     "type": "numeric",
+     "not_null": false,
+     "default": null,
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "disk_backups_mb",
+     "type": "numeric",
+     "not_null": false,
+     "default": null,
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "top_processes_b64",
+     "type": "text",
+     "not_null": false,
+     "default": null,
+     "identity": "",
+     "generated": "",
+     "comment": null
+    }
+   ],
+   "constraints": [
+    {
+     "name": "server_telemetry_pkey",
+     "type": "p",
+     "def": "PRIMARY KEY (id)"
+    },
+    {
+     "name": "server_telemetry_server_id_fkey",
+     "type": "f",
+     "def": "FOREIGN KEY (server_id) REFERENCES servers(id) ON DELETE CASCADE"
+    }
+   ],
+   "indexes": [
+    {
+     "name": "idx_server_telemetry_server_ts",
+     "def": "CREATE INDEX idx_server_telemetry_server_ts ON public.server_telemetry USING btree (server_id, \"timestamp\" DESC)"
+    },
+    {
+     "name": "idx_server_telemetry_ts",
+     "def": "CREATE INDEX idx_server_telemetry_ts ON public.server_telemetry USING btree (\"timestamp\")"
+    }
+   ],
+   "triggers": [],
+   "policies": [
+    {
+     "name": "Enable read access for all telemetry data",
+     "cmd": "r",
+     "permissive": true,
+     "roles": [
+      "authenticated"
+     ],
+     "using": "true",
+     "check": null
+    }
+   ],
+   "grants": [
+    "anon:DELETE",
+    "anon:INSERT",
+    "anon:REFERENCES",
+    "anon:SELECT",
+    "anon:TRIGGER",
+    "anon:TRUNCATE",
+    "anon:UPDATE",
+    "authenticated:DELETE",
+    "authenticated:INSERT",
+    "authenticated:REFERENCES",
+    "authenticated:SELECT",
+    "authenticated:TRIGGER",
+    "authenticated:TRUNCATE",
+    "authenticated:UPDATE",
+    "service_role:DELETE",
+    "service_role:INSERT",
+    "service_role:REFERENCES",
+    "service_role:SELECT",
+    "service_role:TRIGGER",
+    "service_role:TRUNCATE",
+    "service_role:UPDATE"
+   ]
+  },
+  {
+   "name": "server_waf_state",
+   "rls": true,
+   "rls_forced": false,
+   "comment": null,
+   "columns": [
+    {
+     "name": "server_id",
+     "type": "bigint",
+     "not_null": true,
+     "default": null,
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "reported_at",
+     "type": "timestamp with time zone",
+     "not_null": true,
+     "default": "now()",
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "agent_format",
+     "type": "integer",
+     "not_null": true,
+     "default": "1",
+     "identity": "",
+     "generated": "",
+     "comment": null
+    }
+   ],
+   "constraints": [
+    {
+     "name": "server_waf_state_pkey",
+     "type": "p",
+     "def": "PRIMARY KEY (server_id)"
+    }
+   ],
+   "indexes": [],
+   "triggers": [],
+   "policies": [
+    {
+     "name": "server_waf_state authenticated read",
+     "cmd": "r",
+     "permissive": true,
+     "roles": [
+      "authenticated"
+     ],
+     "using": "true",
+     "check": null
+    }
+   ],
+   "grants": [
+    "authenticated:DELETE",
+    "authenticated:INSERT",
+    "authenticated:REFERENCES",
+    "authenticated:SELECT",
+    "authenticated:TRIGGER",
+    "authenticated:TRUNCATE",
+    "authenticated:UPDATE",
+    "service_role:DELETE",
+    "service_role:INSERT",
+    "service_role:REFERENCES",
+    "service_role:SELECT",
+    "service_role:TRIGGER",
+    "service_role:TRUNCATE",
+    "service_role:UPDATE"
+   ]
+  },
+  {
+   "name": "servers",
+   "rls": true,
+   "rls_forced": false,
+   "comment": null,
+   "columns": [
+    {
+     "name": "id",
+     "type": "bigint",
+     "not_null": true,
+     "default": null,
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "label",
+     "type": "text",
+     "not_null": true,
+     "default": null,
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "ip",
+     "type": "text",
+     "not_null": true,
+     "default": null,
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "region",
+     "type": "text",
+     "not_null": false,
+     "default": null,
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "sub_id",
+     "type": "text",
+     "not_null": false,
+     "default": null,
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "subdomain",
+     "type": "text",
+     "not_null": false,
+     "default": null,
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "database",
+     "type": "text",
+     "not_null": false,
+     "default": null,
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "webserver",
+     "type": "text",
+     "not_null": false,
+     "default": null,
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "os_version",
+     "type": "text",
+     "not_null": false,
+     "default": null,
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "status",
+     "type": "text",
+     "not_null": false,
+     "default": null,
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "cpu",
+     "type": "text",
+     "not_null": false,
+     "default": null,
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "ram",
+     "type": "text",
+     "not_null": false,
+     "default": null,
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "region_label",
+     "type": "text",
+     "not_null": false,
+     "default": null,
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "user_id",
+     "type": "bigint",
+     "not_null": false,
+     "default": null,
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "provider_id",
+     "type": "bigint",
+     "not_null": false,
+     "default": null,
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "failover_id",
+     "type": "bigint",
+     "not_null": false,
+     "default": null,
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "high_availability_sync_interval",
+     "type": "integer",
+     "not_null": false,
+     "default": null,
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "is_wsod",
+     "type": "boolean",
+     "not_null": false,
+     "default": null,
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "record_id",
+     "type": "text",
+     "not_null": false,
+     "default": null,
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "uuid",
+     "type": "uuid",
+     "not_null": false,
+     "default": null,
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "us_enabled",
+     "type": "boolean",
+     "not_null": false,
+     "default": null,
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "is_health_check_running",
+     "type": "boolean",
+     "not_null": false,
+     "default": null,
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "is_paired",
+     "type": "boolean",
+     "not_null": false,
+     "default": null,
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "is_preemptive_support_on",
+     "type": "integer",
+     "not_null": false,
+     "default": null,
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "server_key",
+     "type": "text",
+     "not_null": false,
+     "default": null,
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "update_backups",
+     "type": "boolean",
+     "not_null": false,
+     "default": null,
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "beta_server",
+     "type": "integer",
+     "not_null": false,
+     "default": null,
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "provider",
+     "type": "jsonb",
+     "not_null": false,
+     "default": null,
+     "identity": "",
+     "generated": "",
+     "comment": null
+    }
+   ],
+   "constraints": [
+    {
+     "name": "servers_ip_key",
+     "type": "u",
+     "def": "UNIQUE (ip)"
+    },
+    {
+     "name": "servers_pkey",
+     "type": "p",
+     "def": "PRIMARY KEY (id)"
+    }
+   ],
+   "indexes": [],
+   "triggers": [],
+   "policies": [
+    {
+     "name": "Enable read access for all users",
+     "cmd": "r",
+     "permissive": true,
+     "roles": [
+      "authenticated"
+     ],
+     "using": "true",
+     "check": null
+    }
+   ],
+   "grants": [
+    "anon:DELETE",
+    "anon:INSERT",
+    "anon:REFERENCES",
+    "anon:SELECT",
+    "anon:TRIGGER",
+    "anon:TRUNCATE",
+    "anon:UPDATE",
+    "authenticated:DELETE",
+    "authenticated:INSERT",
+    "authenticated:REFERENCES",
+    "authenticated:SELECT",
+    "authenticated:TRIGGER",
+    "authenticated:TRUNCATE",
+    "authenticated:UPDATE",
+    "service_role:DELETE",
+    "service_role:INSERT",
+    "service_role:REFERENCES",
+    "service_role:SELECT",
+    "service_role:TRIGGER",
+    "service_role:TRUNCATE",
+    "service_role:UPDATE"
+   ]
+  },
+  {
+   "name": "site_fail2ban_state",
+   "rls": true,
+   "rls_forced": false,
+   "comment": null,
+   "columns": [
+    {
+     "name": "server_id",
+     "type": "bigint",
+     "not_null": true,
+     "default": null,
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "site",
+     "type": "text",
+     "not_null": true,
+     "default": null,
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "reported_at",
+     "type": "timestamp with time zone",
+     "not_null": true,
+     "default": "now()",
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "plugin",
+     "type": "text",
+     "not_null": true,
+     "default": null,
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "mu_plugin",
+     "type": "text",
+     "not_null": false,
+     "default": null,
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "plugin_dir",
+     "type": "boolean",
+     "not_null": false,
+     "default": null,
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "configs",
+     "type": "boolean",
+     "not_null": false,
+     "default": null,
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "included",
+     "type": "boolean",
+     "not_null": false,
+     "default": null,
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "jails",
+     "type": "jsonb",
+     "not_null": true,
+     "default": "'[]'::jsonb",
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "bans",
+     "type": "jsonb",
+     "not_null": true,
+     "default": "'[]'::jsonb",
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "log_lines",
+     "type": "jsonb",
+     "not_null": true,
+     "default": "'[]'::jsonb",
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "log_24h",
+     "type": "integer",
+     "not_null": true,
+     "default": "0",
+     "identity": "",
+     "generated": "",
+     "comment": null
+    }
+   ],
+   "constraints": [
+    {
+     "name": "site_fail2ban_state_pkey",
+     "type": "p",
+     "def": "PRIMARY KEY (server_id, site)"
+    }
+   ],
+   "indexes": [],
+   "triggers": [],
+   "policies": [
+    {
+     "name": "site_fail2ban_state authenticated read",
+     "cmd": "r",
+     "permissive": true,
+     "roles": [
+      "authenticated"
+     ],
+     "using": "true",
+     "check": null
+    }
+   ],
+   "grants": [
+    "authenticated:DELETE",
+    "authenticated:INSERT",
+    "authenticated:REFERENCES",
+    "authenticated:SELECT",
+    "authenticated:TRIGGER",
+    "authenticated:TRUNCATE",
+    "authenticated:UPDATE",
+    "service_role:DELETE",
+    "service_role:INSERT",
+    "service_role:REFERENCES",
+    "service_role:SELECT",
+    "service_role:TRIGGER",
+    "service_role:TRUNCATE",
+    "service_role:UPDATE"
+   ]
+  },
+  {
+   "name": "site_staging_state",
+   "rls": true,
+   "rls_forced": false,
+   "comment": null,
+   "columns": [
+    {
+     "name": "site_id",
+     "type": "bigint",
+     "not_null": true,
+     "default": null,
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "is_active",
+     "type": "boolean",
+     "not_null": true,
+     "default": "false",
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "note",
+     "type": "text",
+     "not_null": false,
+     "default": null,
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "noted_at",
+     "type": "timestamp with time zone",
+     "not_null": true,
+     "default": "now()",
+     "identity": "",
+     "generated": "",
+     "comment": null
+    }
+   ],
+   "constraints": [
+    {
+     "name": "site_staging_state_pkey",
+     "type": "p",
+     "def": "PRIMARY KEY (site_id)"
+    },
+    {
+     "name": "site_staging_state_site_id_fkey",
+     "type": "f",
+     "def": "FOREIGN KEY (site_id) REFERENCES sites(id) ON DELETE CASCADE"
+    }
+   ],
+   "indexes": [
+    {
+     "name": "site_staging_state_active_idx",
+     "def": "CREATE INDEX site_staging_state_active_idx ON public.site_staging_state USING btree (site_id) WHERE is_active"
+    }
+   ],
+   "triggers": [],
+   "policies": [
+    {
+     "name": "site_staging_state authenticated all",
+     "cmd": "*",
+     "permissive": true,
+     "roles": [
+      "authenticated"
+     ],
+     "using": "true",
+     "check": "true"
+    }
+   ],
+   "grants": [
+    "anon:DELETE",
+    "anon:INSERT",
+    "anon:REFERENCES",
+    "anon:SELECT",
+    "anon:TRIGGER",
+    "anon:TRUNCATE",
+    "anon:UPDATE",
+    "authenticated:DELETE",
+    "authenticated:INSERT",
+    "authenticated:REFERENCES",
+    "authenticated:SELECT",
+    "authenticated:TRIGGER",
+    "authenticated:TRUNCATE",
+    "authenticated:UPDATE",
+    "service_role:DELETE",
+    "service_role:INSERT",
+    "service_role:REFERENCES",
+    "service_role:SELECT",
+    "service_role:TRIGGER",
+    "service_role:TRUNCATE",
+    "service_role:UPDATE"
+   ]
+  },
+  {
+   "name": "site_waf_state",
+   "rls": true,
+   "rls_forced": false,
+   "comment": null,
+   "columns": [
+    {
+     "name": "server_id",
+     "type": "bigint",
+     "not_null": true,
+     "default": null,
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "site",
+     "type": "text",
+     "not_null": true,
+     "default": null,
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "reported_at",
+     "type": "timestamp with time zone",
+     "not_null": true,
+     "default": "now()",
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "waf",
+     "type": "text",
+     "not_null": false,
+     "default": null,
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "rulesets",
+     "type": "jsonb",
+     "not_null": true,
+     "default": "'{}'::jsonb",
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "g8_mode",
+     "type": "text",
+     "not_null": true,
+     "default": "'none'::text",
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "g8_loaded",
+     "type": "boolean",
+     "not_null": true,
+     "default": "false",
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "g8_version",
+     "type": "text",
+     "not_null": false,
+     "default": null,
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "g8_log_bytes",
+     "type": "bigint",
+     "not_null": false,
+     "default": null,
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "g8_log_at",
+     "type": "timestamp with time zone",
+     "not_null": false,
+     "default": null,
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "g7_day",
+     "type": "jsonb",
+     "not_null": false,
+     "default": null,
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "g8_day",
+     "type": "jsonb",
+     "not_null": false,
+     "default": null,
+     "identity": "",
+     "generated": "",
+     "comment": null
+    }
+   ],
+   "constraints": [
+    {
+     "name": "site_waf_state_pkey",
+     "type": "p",
+     "def": "PRIMARY KEY (server_id, site)"
+    }
+   ],
+   "indexes": [],
+   "triggers": [],
+   "policies": [
+    {
+     "name": "site_waf_state authenticated read",
+     "cmd": "r",
+     "permissive": true,
+     "roles": [
+      "authenticated"
+     ],
+     "using": "true",
+     "check": null
+    }
+   ],
+   "grants": [
+    "authenticated:DELETE",
+    "authenticated:INSERT",
+    "authenticated:REFERENCES",
+    "authenticated:SELECT",
+    "authenticated:TRIGGER",
+    "authenticated:TRUNCATE",
+    "authenticated:UPDATE",
+    "service_role:DELETE",
+    "service_role:INSERT",
+    "service_role:REFERENCES",
+    "service_role:SELECT",
+    "service_role:TRIGGER",
+    "service_role:TRUNCATE",
+    "service_role:UPDATE"
+   ]
+  },
+  {
+   "name": "sites",
+   "rls": true,
+   "rls_forced": false,
+   "comment": null,
+   "columns": [
+    {
+     "name": "id",
+     "type": "bigint",
+     "not_null": true,
+     "default": null,
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "url",
+     "type": "text",
+     "not_null": true,
+     "default": null,
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "server_id",
+     "type": "bigint",
+     "not_null": false,
+     "default": null,
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "user_id",
+     "type": "bigint",
+     "not_null": false,
+     "default": null,
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "system_user_id",
+     "type": "bigint",
+     "not_null": false,
+     "default": null,
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "is_wsod",
+     "type": "boolean",
+     "not_null": false,
+     "default": null,
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "is_sso",
+     "type": "boolean",
+     "not_null": false,
+     "default": null,
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "is_ssl",
+     "type": "boolean",
+     "not_null": false,
+     "default": null,
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "ssl_status",
+     "type": "text",
+     "not_null": false,
+     "default": null,
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "resolved_at",
+     "type": "timestamp with time zone",
+     "not_null": false,
+     "default": null,
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "php_version",
+     "type": "text",
+     "not_null": false,
+     "default": null,
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "waf",
+     "type": "text",
+     "not_null": false,
+     "default": null,
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "remote_bup",
+     "type": "boolean",
+     "not_null": false,
+     "default": null,
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "local_bup",
+     "type": "boolean",
+     "not_null": false,
+     "default": null,
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "automatic_updates",
+     "type": "boolean",
+     "not_null": false,
+     "default": null,
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "nginx_caching",
+     "type": "text",
+     "not_null": false,
+     "default": null,
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "site_security_settings",
+     "type": "jsonb",
+     "not_null": false,
+     "default": null,
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "site_customizer",
+     "type": "jsonb",
+     "not_null": false,
+     "default": null,
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "built_at",
+     "type": "timestamp with time zone",
+     "not_null": false,
+     "default": null,
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "staging_site_built_at",
+     "type": "text",
+     "not_null": false,
+     "default": null,
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "site_nickname",
+     "type": "text",
+     "not_null": false,
+     "default": null,
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "cloudflare_dns_name",
+     "type": "text",
+     "not_null": false,
+     "default": null,
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "max_execution_time",
+     "type": "integer",
+     "not_null": false,
+     "default": null,
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "max_file_uploads",
+     "type": "integer",
+     "not_null": false,
+     "default": null,
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "max_input_time",
+     "type": "integer",
+     "not_null": false,
+     "default": null,
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "max_input_vars",
+     "type": "integer",
+     "not_null": false,
+     "default": null,
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "memory_limit",
+     "type": "integer",
+     "not_null": false,
+     "default": null,
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "post_max_size",
+     "type": "integer",
+     "not_null": false,
+     "default": null,
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "upload_max_filesize",
+     "type": "integer",
+     "not_null": false,
+     "default": null,
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "pm",
+     "type": "text",
+     "not_null": false,
+     "default": null,
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "pm_max_children",
+     "type": "integer",
+     "not_null": false,
+     "default": null,
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "pm_start_servers",
+     "type": "integer",
+     "not_null": false,
+     "default": null,
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "pm_max_requests",
+     "type": "integer",
+     "not_null": false,
+     "default": null,
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "pm_process_idle_timeout",
+     "type": "integer",
+     "not_null": false,
+     "default": null,
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "is_php_slowlog",
+     "type": "boolean",
+     "not_null": false,
+     "default": null,
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "php_slowlog_timeout",
+     "type": "integer",
+     "not_null": false,
+     "default": null,
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "php_slowlog_trace_depth",
+     "type": "integer",
+     "not_null": false,
+     "default": null,
+     "identity": "",
+     "generated": "",
+     "comment": null
+    }
+   ],
+   "constraints": [
+    {
+     "name": "sites_pkey",
+     "type": "p",
+     "def": "PRIMARY KEY (id)"
+    },
+    {
+     "name": "sites_server_id_fkey",
+     "type": "f",
+     "def": "FOREIGN KEY (server_id) REFERENCES servers(id) ON DELETE CASCADE"
+    }
+   ],
+   "indexes": [
+    {
+     "name": "sites_url_idx",
+     "def": "CREATE INDEX sites_url_idx ON public.sites USING btree (url)"
+    }
+   ],
+   "triggers": [],
+   "policies": [
+    {
+     "name": "Enable read access for all users",
+     "cmd": "r",
+     "permissive": true,
+     "roles": [
+      "authenticated"
+     ],
+     "using": "true",
+     "check": null
+    }
+   ],
+   "grants": [
+    "anon:DELETE",
+    "anon:INSERT",
+    "anon:REFERENCES",
+    "anon:SELECT",
+    "anon:TRIGGER",
+    "anon:TRUNCATE",
+    "anon:UPDATE",
+    "authenticated:DELETE",
+    "authenticated:INSERT",
+    "authenticated:REFERENCES",
+    "authenticated:SELECT",
+    "authenticated:TRIGGER",
+    "authenticated:TRUNCATE",
+    "authenticated:UPDATE",
+    "service_role:DELETE",
+    "service_role:INSERT",
+    "service_role:REFERENCES",
+    "service_role:SELECT",
+    "service_role:TRIGGER",
+    "service_role:TRUNCATE",
+    "service_role:UPDATE"
+   ]
+  },
+  {
+   "name": "system_logs",
+   "rls": true,
+   "rls_forced": false,
+   "comment": null,
+   "columns": [
+    {
+     "name": "id",
+     "type": "uuid",
+     "not_null": true,
+     "default": "gen_random_uuid()",
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "created_at",
+     "type": "timestamp with time zone",
+     "not_null": true,
+     "default": "timezone('utc'::text, now())",
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "level",
+     "type": "text",
+     "not_null": true,
+     "default": null,
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "message",
+     "type": "text",
+     "not_null": true,
+     "default": null,
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "site_url",
+     "type": "text",
+     "not_null": false,
+     "default": null,
+     "identity": "",
+     "generated": "",
+     "comment": null
+    },
+    {
+     "name": "is_read",
+     "type": "boolean",
+     "not_null": true,
+     "default": "false",
+     "identity": "",
+     "generated": "",
+     "comment": null
+    }
+   ],
+   "constraints": [
+    {
+     "name": "system_logs_pkey",
+     "type": "p",
+     "def": "PRIMARY KEY (id)"
+    }
+   ],
+   "indexes": [],
+   "triggers": [],
+   "policies": [
+    {
+     "name": "system_logs authenticated all",
+     "cmd": "*",
+     "permissive": true,
+     "roles": [
+      "authenticated"
+     ],
+     "using": "true",
+     "check": "true"
+    }
+   ],
+   "grants": [
+    "anon:DELETE",
+    "anon:INSERT",
+    "anon:REFERENCES",
+    "anon:SELECT",
+    "anon:TRIGGER",
+    "anon:TRUNCATE",
+    "anon:UPDATE",
+    "authenticated:DELETE",
+    "authenticated:INSERT",
+    "authenticated:REFERENCES",
+    "authenticated:SELECT",
+    "authenticated:TRIGGER",
+    "authenticated:TRUNCATE",
+    "authenticated:UPDATE",
+    "service_role:DELETE",
+    "service_role:INSERT",
+    "service_role:REFERENCES",
+    "service_role:SELECT",
+    "service_role:TRIGGER",
+    "service_role:TRUNCATE",
+    "service_role:UPDATE"
+   ]
+  }
+ ],
+ "functions": [
+  {
+   "name": "ingest_cloudflare_waf",
+   "args": "p_report_sha256 text, p_run_dir text, p_generated_at timestamp with time zone, p_zones jsonb, p_allow_older boolean",
+   "security_definer": false,
+   "may_run": [
+    "service_role"
+   ],
+   "def": "CREATE OR REPLACE FUNCTION public.ingest_cloudflare_waf(p_report_sha256 text, p_run_dir text, p_generated_at timestamp with time zone, p_zones jsonb, p_allow_older boolean DEFAULT false)\n RETURNS jsonb\n LANGUAGE plpgsql\n SET search_path TO 'public'\nAS $function$\ndeclare\n    v_latest  public.cloudflare_waf_runs%rowtype;\n    v_run_id  bigint;\n    v_removed text[];\n    v_rules   integer;\n    v_masked  integer;\nbegin\n    if jsonb_typeof(p_zones) <> 'array' or jsonb_array_length(p_zones) = 0 then\n        raise exception 'p_zones must be a non-empty array';\n    end if;\n\n    select * into v_latest from public.cloudflare_waf_runs\n     order by generated_at desc, id desc limit 1;\n\n    if found and v_latest.report_sha256 = p_report_sha256 then\n        -- The same rules, read again later (the daily refresh on a quiet day).\n        -- No zone is touched, but the run's date moves forward: it means \"the\n        -- fleet was last confirmed to look like this at\", and without this a\n        -- fleet nobody changed for two weeks would be shown as out of date.\n        if p_generated_at > v_latest.generated_at then\n            update public.cloudflare_waf_runs\n               set generated_at = p_generated_at, run_dir = p_run_dir, ingested_at = now()\n             where id = v_latest.id;\n            return jsonb_build_object('changed', false, 'confirmed', true, 'run_id', v_latest.id);\n        end if;\n        return jsonb_build_object('changed', false, 'confirmed', false, 'run_id', v_latest.id);\n    end if;\n\n    if found and p_generated_at < v_latest.generated_at and not p_allow_older then\n        raise exception 'report (%) is older than the latest ingested run (%)',\n            p_generated_at, v_latest.generated_at;\n    end if;\n\n    select coalesce(sum(jsonb_array_length(z->'rules')), 0),\n           coalesce(sum((select count(*) from jsonb_array_elements(z->'rules') r\n                          where (r->>'expr_masked')::boolean)), 0)\n      into v_rules, v_masked\n      from jsonb_array_elements(p_zones) z;\n\n    insert into public.cloudflare_waf_runs\n        (report_sha256, run_dir, generated_at, zone_count, rule_count, masked_count)\n    values\n        (p_report_sha256, p_run_dir, p_generated_at, jsonb_array_length(p_zones), v_rules, v_masked)\n    on conflict (report_sha256) do update\n        set run_dir = excluded.run_dir, generated_at = excluded.generated_at, ingested_at = now()\n    returning id into v_run_id;\n\n    select coalesce(array_agg(name order by name), '{}') into v_removed\n      from public.cloudflare_zones\n     where zone_id not in (select z->>'zone_id' from jsonb_array_elements(p_zones) z);\n\n    delete from public.cloudflare_zones\n     where zone_id not in (select z->>'zone_id' from jsonb_array_elements(p_zones) z);\n\n    -- A zone renamed onto a name another row still holds would trip the unique\n    -- name constraint mid-upsert; clear any such stale holder first.\n    delete from public.cloudflare_zones c\n     using jsonb_array_elements(p_zones) z\n     where c.name = z->>'name' and c.zone_id <> z->>'zone_id';\n\n    insert into public.cloudflare_zones (\n        zone_id, name, run_id, plan, account, paused, nrules, ratelimit_rules,\n        ruleset_version, ruleset_updated, profile, nearest, klass, comparable,\n        core_fp, rule_order, order_matches, findings, reach, rules\n    )\n    select z->>'zone_id', z->>'name', v_run_id, z->>'plan', z->>'acct',\n           coalesce((z->>'paused')::boolean, false),\n           coalesce((z->>'nrules')::integer, 0),\n           coalesce((z->>'ratelimit_rules')::integer, 0),\n           z->>'version', nullif(z->>'updated', '')::date,\n           z->>'profile', z->>'nearest', z->>'klass', (z->>'comparable')::boolean,\n           z->>'core_fp', coalesce(z->'order', '[]'::jsonb), (z->>'order_matches')::boolean,\n           coalesce(z->'findings', '[]'::jsonb), coalesce(z->'reach', '{}'::jsonb),\n           coalesce(z->'rules', '[]'::jsonb)\n      from jsonb_array_elements(p_zones) z\n    on conflict (zone_id) do update set\n        name = excluded.name, run_id = excluded.run_id, plan = excluded.plan,\n        account = excluded.account, paused = excluded.paused, nrules = excluded.nrules,\n        ratelimit_rules = excluded.ratelimit_rules, ruleset_version = excluded.ruleset_version,\n        ruleset_updated = excluded.ruleset_updated, profile = excluded.profile,\n        nearest = excluded.nearest, klass = excluded.klass, comparable = excluded.comparable,\n        core_fp = excluded.core_fp, rule_order = excluded.rule_order,\n        order_matches = excluded.order_matches, findings = excluded.findings,\n        reach = excluded.reach, rules = excluded.rules;\n\n    return jsonb_build_object('changed', true, 'run_id', v_run_id,\n        'zones', jsonb_array_length(p_zones), 'rules', v_rules, 'masked', v_masked,\n        'removed', to_jsonb(v_removed));\nend;\n$function$"
+  },
+  {
+   "name": "report_fail2ban",
+   "args": "p_server_id bigint, p_token text, p_report jsonb",
+   "security_definer": true,
+   "may_run": [
+    "anon",
+    "authenticated",
+    "service_role"
+   ],
+   "def": "CREATE OR REPLACE FUNCTION public.report_fail2ban(p_server_id bigint, p_token text, p_report jsonb)\n RETURNS void\n LANGUAGE plpgsql\n SECURITY DEFINER\n SET search_path TO 'public', 'extensions'\nAS $function$\ndeclare\n    v_now timestamptz := now();\nbegin\n    if not public.verify_agent(p_server_id, p_token) then\n        raise exception 'agent token required and must match for server %', p_server_id\n            using errcode = '42501';\n    end if;\n\n    if jsonb_typeof(p_report) is distinct from 'object'\n       or jsonb_typeof(p_report->'sites') is distinct from 'array'\n       or jsonb_typeof(p_report->'server_jails') is distinct from 'array' then\n        raise exception 'report must be an object with sites and server_jails arrays'\n            using errcode = '22023';\n    end if;\n\n    -- Bans as they were at the last report, compared with the bans in this one.\n    -- A ban is keyed by its jail and address; a server jail's bans carry no site.\n    -- No event on a server's very first report: with nothing to compare against,\n    -- every standing ban would be logged as new at once.\n    if exists (select 1 from public.server_fail2ban_state where server_id = p_server_id) then\n        with old_bans as (\n            select s.site, b->>'jail' as jail, b->>'ip' as ip\n              from public.site_fail2ban_state s, jsonb_array_elements(s.bans) b\n             where s.server_id = p_server_id\n            union all\n            select null, j->>'name', b->>'ip'\n              from public.server_fail2ban_state s,\n                   jsonb_array_elements(s.server_jails) j,\n                   jsonb_array_elements(coalesce(j->'bans', '[]'::jsonb)) b\n             where s.server_id = p_server_id\n        ), new_bans as (\n            select x->>'site' as site, b->>'jail' as jail, b->>'ip' as ip,\n                   nullif(b->>'at', '')::timestamptz as at\n              from jsonb_array_elements(p_report->'sites') x,\n                   jsonb_array_elements(coalesce(x->'bans', '[]'::jsonb)) b\n            union all\n            select null, j->>'name', b->>'ip', nullif(b->>'at', '')::timestamptz\n              from jsonb_array_elements(p_report->'server_jails') j,\n                   jsonb_array_elements(coalesce(j->'bans', '[]'::jsonb)) b\n        )\n        insert into public.fail2ban_events (server_id, site, jail, ip, event, at)\n        select p_server_id, n.site, n.jail, n.ip, 'ban', coalesce(n.at, v_now)\n          from new_bans n\n         where n.jail is not null and n.ip is not null\n           and not exists (select 1 from old_bans p where p.jail = n.jail and p.ip = n.ip)\n        union all\n        select p_server_id, p.site, p.jail, p.ip, 'unban', v_now\n          from old_bans p\n         where p.jail is not null and p.ip is not null\n           and not exists (select 1 from new_bans n where n.jail = p.jail and n.ip = p.ip);\n    end if;\n\n    delete from public.fail2ban_events\n     where server_id = p_server_id and at < v_now - interval '30 days';\n\n    -- Replace this server's sites wholesale: a folder that is gone must not go on\n    -- showing its last status.\n    delete from public.site_fail2ban_state\n     where server_id = p_server_id\n       and site not in (select x->>'site' from jsonb_array_elements(p_report->'sites') x\n                         where x->>'site' is not null);\n\n    insert into public.site_fail2ban_state (\n        server_id, site, reported_at, plugin, mu_plugin, plugin_dir, configs, included,\n        jails, bans, log_lines, log_24h\n    )\n    select p_server_id, x->>'site', v_now,\n           coalesce(x->>'plugin', 'broken'), x->>'mu_plugin',\n           (x->>'plugin_dir')::boolean, (x->>'configs')::boolean, (x->>'included')::boolean,\n           coalesce(x->'jails', '[]'::jsonb), coalesce(x->'bans', '[]'::jsonb),\n           coalesce(x->'log', '[]'::jsonb), coalesce((x->>'log_24h')::integer, 0)\n      from jsonb_array_elements(p_report->'sites') x\n     where x->>'site' is not null\n    on conflict (server_id, site) do update set\n        reported_at = excluded.reported_at, plugin = excluded.plugin,\n        mu_plugin = excluded.mu_plugin, plugin_dir = excluded.plugin_dir,\n        configs = excluded.configs, included = excluded.included,\n        jails = excluded.jails, bans = excluded.bans,\n        log_lines = excluded.log_lines, log_24h = excluded.log_24h;\n\n    insert into public.server_fail2ban_state (\n        server_id, reported_at, agent_format, fail2ban_present, fail2ban_running,\n        fail2ban_version, token_file_present, gpcloudflare_conf, auth_log_readable,\n        server_jails, orphan_jails\n    )\n    values (\n        p_server_id, v_now, coalesce((p_report->>'v')::integer, 1),\n        coalesce((p_report#>>'{fail2ban,present}')::boolean, false),\n        coalesce((p_report#>>'{fail2ban,running}')::boolean, false),\n        nullif(p_report#>>'{fail2ban,version}', ''),\n        coalesce((p_report->>'token_file')::boolean, false),\n        coalesce((p_report->>'gpcloudflare_conf')::boolean, false),\n        coalesce((p_report->>'auth_log')::boolean, false),\n        p_report->'server_jails', coalesce(p_report->'orphan_jails', '[]'::jsonb)\n    )\n    on conflict (server_id) do update set\n        reported_at = excluded.reported_at, agent_format = excluded.agent_format,\n        fail2ban_present = excluded.fail2ban_present, fail2ban_running = excluded.fail2ban_running,\n        fail2ban_version = excluded.fail2ban_version, token_file_present = excluded.token_file_present,\n        gpcloudflare_conf = excluded.gpcloudflare_conf, auth_log_readable = excluded.auth_log_readable,\n        server_jails = excluded.server_jails, orphan_jails = excluded.orphan_jails;\nend;\n$function$"
+  },
+  {
+   "name": "report_firewall_state",
+   "args": "p_server_id bigint, p_ufw_enabled boolean, p_ufw_denied_ips text[], p_nginx_denies jsonb, p_ufw_allowed_ips text[], p_fail2ban_ignoreip text[], p_fail2ban_banned jsonb, p_fail2ban_present boolean, p_token text, p_ufw_web_sources text[]",
+   "security_definer": true,
+   "may_run": [
+    "PUBLIC",
+    "anon",
+    "authenticated",
+    "service_role"
+   ],
+   "def": "CREATE OR REPLACE FUNCTION public.report_firewall_state(p_server_id bigint, p_ufw_enabled boolean, p_ufw_denied_ips text[], p_nginx_denies jsonb, p_ufw_allowed_ips text[] DEFAULT NULL::text[], p_fail2ban_ignoreip text[] DEFAULT NULL::text[], p_fail2ban_banned jsonb DEFAULT NULL::jsonb, p_fail2ban_present boolean DEFAULT NULL::boolean, p_token text DEFAULT NULL::text, p_ufw_web_sources text[] DEFAULT NULL::text[])\n RETURNS void\n LANGUAGE plpgsql\n SECURITY DEFINER\n SET search_path TO 'public', 'extensions'\nAS $function$\nbegin\n    if not public.verify_agent(p_server_id, p_token) then\n        raise exception 'agent token required and must match for server %', p_server_id\n            using errcode = '42501';\n    end if;\n\n    insert into public.server_firewall_state (\n        server_id, ufw_enabled, ufw_denied_ips, nginx_denies,\n        ufw_allowed_ips, fail2ban_ignoreip, fail2ban_banned, fail2ban_present,\n        ufw_web_sources, reported_at\n    )\n    values (\n        p_server_id, p_ufw_enabled, p_ufw_denied_ips, p_nginx_denies,\n        p_ufw_allowed_ips, p_fail2ban_ignoreip, p_fail2ban_banned, p_fail2ban_present,\n        p_ufw_web_sources, now()\n    )\n    on conflict (server_id) do update set\n        ufw_enabled       = excluded.ufw_enabled,\n        ufw_denied_ips    = excluded.ufw_denied_ips,\n        nginx_denies      = excluded.nginx_denies,\n        ufw_allowed_ips   = excluded.ufw_allowed_ips,\n        fail2ban_ignoreip = excluded.fail2ban_ignoreip,\n        fail2ban_banned   = excluded.fail2ban_banned,\n        fail2ban_present  = excluded.fail2ban_present,\n        ufw_web_sources   = excluded.ufw_web_sources,\n        reported_at       = excluded.reported_at;\nend;\n$function$"
+  },
+  {
+   "name": "report_hardware",
+   "args": "p_server_id bigint, p_cpu_cores integer, p_ram_total_mb integer, p_vendor text, p_product text, p_token text",
+   "security_definer": true,
+   "may_run": [
+    "PUBLIC",
+    "anon",
+    "authenticated",
+    "service_role"
+   ],
+   "def": "CREATE OR REPLACE FUNCTION public.report_hardware(p_server_id bigint, p_cpu_cores integer, p_ram_total_mb integer, p_vendor text, p_product text, p_token text DEFAULT NULL::text)\n RETURNS void\n LANGUAGE plpgsql\n SECURITY DEFINER\n SET search_path TO 'public', 'extensions'\nAS $function$\nbegin\n    if not public.verify_agent(p_server_id, p_token) then\n        raise exception 'agent token required and must match for server %', p_server_id\n            using errcode = '42501';\n    end if;\n\n    insert into public.server_hardware (server_id, cpu_cores, ram_total_mb, vendor, product, reported_at)\n    values (p_server_id, p_cpu_cores, p_ram_total_mb,\n            nullif(btrim(p_vendor), ''), nullif(btrim(p_product), ''), now())\n    on conflict (server_id) do update set\n        cpu_cores    = excluded.cpu_cores,\n        ram_total_mb = excluded.ram_total_mb,\n        vendor       = excluded.vendor,\n        product      = excluded.product,\n        reported_at  = excluded.reported_at;\nend;\n$function$"
+  },
+  {
+   "name": "report_opcache",
+   "args": "p_server_id bigint, p_token text, p_report jsonb",
+   "security_definer": true,
+   "may_run": [
+    "anon",
+    "authenticated",
+    "service_role"
+   ],
+   "def": "CREATE OR REPLACE FUNCTION public.report_opcache(p_server_id bigint, p_token text, p_report jsonb)\n RETURNS void\n LANGUAGE plpgsql\n SECURITY DEFINER\n SET search_path TO 'public', 'extensions'\nAS $function$\ndeclare\n    v_now timestamptz := now();\nbegin\n    if not public.verify_agent(p_server_id, p_token) then\n        raise exception 'agent token required and must match for server %', p_server_id\n            using errcode = '42501';\n    end if;\n\n    if jsonb_typeof(p_report) is distinct from 'object'\n       or jsonb_typeof(p_report->'versions') is distinct from 'array' then\n        raise exception 'report must be an object with a versions array'\n            using errcode = '22023';\n    end if;\n\n    delete from public.php_opcache_state\n     where server_id = p_server_id\n       and php_version not in (select x->>'version' from jsonb_array_elements(p_report->'versions') x\n                                where x->>'version' is not null);\n\n    insert into public.php_opcache_state as t (\n        server_id, php_version, reported_at, pools, sites, ini, live, live_error, prev\n    )\n    select p_server_id, x->>'version', v_now,\n           coalesce((x->>'pools')::integer, 0),\n           case when jsonb_typeof(x->'sites') = 'array' then x->'sites' else '[]'::jsonb end,\n           case when jsonb_typeof(x->'ini') = 'object' then x->'ini' end,\n           case when jsonb_typeof(x->'live') = 'object' then x->'live' end,\n           nullif(left(x->>'live_error', 200), ''),\n           null\n      from jsonb_array_elements(p_report->'versions') x\n     where x->>'version' is not null\n    on conflict (server_id, php_version) do update set\n        -- Before the new numbers replace the old: keep the old counters, but only\n        -- while it is the same PHP run. After a restart they start from zero.\n        prev = case\n                 when t.live is not null and excluded.live is not null\n                  and t.live->>'start' is not distinct from excluded.live->>'start'\n                  and t.live->>'last_restart' is not distinct from excluded.live->>'last_restart'\n                 then jsonb_build_object('hits', t.live->'hits', 'misses', t.live->'misses', 'at', t.reported_at)\n               end,\n        reported_at = excluded.reported_at, pools = excluded.pools, sites = excluded.sites,\n        ini = excluded.ini, live = excluded.live, live_error = excluded.live_error;\n\n    -- The server row last: the app listens for it, so the version rows are in by then.\n    insert into public.server_opcache_state (server_id, reported_at, agent_format)\n    values (p_server_id, v_now, coalesce((p_report->>'v')::integer, 1))\n    on conflict (server_id) do update set\n        reported_at = excluded.reported_at, agent_format = excluded.agent_format;\nend;\n$function$"
+  },
+  {
+   "name": "report_telemetry",
+   "args": "p_server_id bigint, p_cpu_usage numeric, p_ram_usage numeric, p_disk_usage numeric, p_disk_total_gb numeric, p_disk_www_mb numeric, p_disk_mysql_mb numeric, p_disk_backups_mb numeric, p_top_processes_b64 text, p_timestamp timestamp with time zone, p_token text",
+   "security_definer": true,
+   "may_run": [
+    "PUBLIC",
+    "anon",
+    "authenticated",
+    "service_role"
+   ],
+   "def": "CREATE OR REPLACE FUNCTION public.report_telemetry(p_server_id bigint, p_cpu_usage numeric, p_ram_usage numeric, p_disk_usage numeric, p_disk_total_gb numeric DEFAULT NULL::numeric, p_disk_www_mb numeric DEFAULT NULL::numeric, p_disk_mysql_mb numeric DEFAULT NULL::numeric, p_disk_backups_mb numeric DEFAULT NULL::numeric, p_top_processes_b64 text DEFAULT NULL::text, p_timestamp timestamp with time zone DEFAULT NULL::timestamp with time zone, p_token text DEFAULT NULL::text)\n RETURNS void\n LANGUAGE plpgsql\n SECURITY DEFINER\n SET search_path TO 'public', 'extensions'\nAS $function$\nbegin\n    if not public.verify_agent(p_server_id, p_token) then\n        raise exception 'agent token required and must match for server %', p_server_id\n            using errcode = '42501';\n    end if;\n\n    insert into public.server_telemetry (\n        server_id, cpu_usage, ram_usage, disk_usage, disk_total_gb,\n        disk_www_mb, disk_mysql_mb, disk_backups_mb, top_processes_b64, \"timestamp\"\n    )\n    values (\n        p_server_id, p_cpu_usage, p_ram_usage, p_disk_usage, p_disk_total_gb,\n        p_disk_www_mb, p_disk_mysql_mb, p_disk_backups_mb, p_top_processes_b64,\n        coalesce(p_timestamp, now())\n    );\nend;\n$function$"
+  },
+  {
+   "name": "report_waf",
+   "args": "p_server_id bigint, p_token text, p_report jsonb",
+   "security_definer": true,
+   "may_run": [
+    "anon",
+    "authenticated",
+    "service_role"
+   ],
+   "def": "CREATE OR REPLACE FUNCTION public.report_waf(p_server_id bigint, p_token text, p_report jsonb)\n RETURNS void\n LANGUAGE plpgsql\n SECURITY DEFINER\n SET search_path TO 'public', 'extensions'\nAS $function$\ndeclare\n    v_now timestamptz := now();\nbegin\n    if not public.verify_agent(p_server_id, p_token) then\n        raise exception 'agent token required and must match for server %', p_server_id\n            using errcode = '42501';\n    end if;\n\n    if jsonb_typeof(p_report) is distinct from 'object'\n       or jsonb_typeof(p_report->'sites') is distinct from 'array' then\n        raise exception 'report must be an object with a sites array'\n            using errcode = '22023';\n    end if;\n\n    delete from public.site_waf_state\n     where server_id = p_server_id\n       and site not in (select x->>'site' from jsonb_array_elements(p_report->'sites') x\n                         where x->>'site' is not null);\n\n    insert into public.site_waf_state (\n        server_id, site, reported_at, waf, rulesets, g8_mode, g8_loaded, g8_version,\n        g8_log_bytes, g8_log_at, g7_day, g8_day\n    )\n    select p_server_id, x->>'site', v_now,\n           nullif(x->>'waf', ''),\n           case when jsonb_typeof(x->'rulesets') = 'object' then x->'rulesets' else '{}'::jsonb end,\n           coalesce(nullif(x#>>'{g8,mode}', ''), 'none'),\n           coalesce((x#>>'{g8,rules_loaded}')::boolean, false),\n           nullif(x#>>'{g8,version}', ''),\n           (x#>>'{g8,log_bytes}')::bigint,\n           nullif(x#>>'{g8,log_at}', '')::timestamptz,\n           case when jsonb_typeof(x->'g7_day') = 'object' then x->'g7_day' end,\n           case when jsonb_typeof(x->'g8_day') = 'object' then x->'g8_day' end\n      from jsonb_array_elements(p_report->'sites') x\n     where x->>'site' is not null\n    on conflict (server_id, site) do update set\n        reported_at = excluded.reported_at, waf = excluded.waf, rulesets = excluded.rulesets,\n        g8_mode = excluded.g8_mode, g8_loaded = excluded.g8_loaded, g8_version = excluded.g8_version,\n        g8_log_bytes = excluded.g8_log_bytes, g8_log_at = excluded.g8_log_at,\n        g7_day = excluded.g7_day, g8_day = excluded.g8_day;\n\n    -- The server row last: the app listens for it, so the site rows are in by then.\n    insert into public.server_waf_state (server_id, reported_at, agent_format)\n    values (p_server_id, v_now, coalesce((p_report->>'v')::integer, 1))\n    on conflict (server_id) do update set\n        reported_at = excluded.reported_at, agent_format = excluded.agent_format;\nend;\n$function$"
+  },
+  {
+   "name": "verify_agent",
+   "args": "p_server_id bigint, p_token text",
+   "security_definer": true,
+   "may_run": [
+    "service_role"
+   ],
+   "def": "CREATE OR REPLACE FUNCTION public.verify_agent(p_server_id bigint, p_token text)\n RETURNS boolean\n LANGUAGE plpgsql\n SECURITY DEFINER\n SET search_path TO 'public', 'extensions'\nAS $function$\ndeclare\n    v_ok boolean;\nbegin\n    -- Cheap reject before touching the table. Also stops a caller probing with\n    -- an empty string from being treated as a real attempt.\n    if p_token is null or length(p_token) < 32 then\n        return false;\n    end if;\n\n    update public.server_agent_secrets\n       set last_used_at = now()\n     where server_id  = p_server_id\n       and token_hash = encode(extensions.digest(p_token, 'sha256'), 'hex')\n    returning true into v_ok;\n\n    return coalesce(v_ok, false);\nend;\n$function$"
+  }
+ ],
+ "views": [],
+ "enums": [],
+ "sequences": [
+  {
+   "name": "cloudflare_waf_runs_id_seq",
+   "type": "bigint",
+   "increment": 1
+  },
+  {
+   "name": "fail2ban_events_id_seq",
+   "type": "bigint",
+   "increment": 1
+  },
+  {
+   "name": "ip_allowlist_id_seq",
+   "type": "bigint",
+   "increment": 1
+  },
+  {
+   "name": "ip_blocks_id_seq",
+   "type": "bigint",
+   "increment": 1
+  },
+  {
+   "name": "server_telemetry_id_seq",
+   "type": "bigint",
+   "increment": 1
+  }
+ ],
+ "outside_triggers": [],
+ "publications": [
+  "supabase_realtime:server_fail2ban_state",
+  "supabase_realtime:server_opcache_state",
+  "supabase_realtime:server_telemetry",
+  "supabase_realtime:server_waf_state"
+ ],
+ "cron_jobs": [
+  {
+   "name": "prune-system-logs",
+   "schedule": "30 0 * * *",
+   "command": "DELETE FROM public.system_logs WHERE created_at < NOW() - INTERVAL '30 days'",
+   "active": true
+  },
+  {
+   "name": "prune-telemetry",
+   "schedule": "15 0 * * *",
+   "command": "DELETE FROM public.server_telemetry WHERE timestamp < NOW() - INTERVAL '7 days'",
+   "active": true
+  }
+ ]
+}

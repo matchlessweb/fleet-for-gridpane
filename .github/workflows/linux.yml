@@ -1,0 +1,47 @@
+# The test suites on Linux, started by hand: Actions > "checks on Linux" > Run workflow.
+# GitHub runs it only from .github/workflows/linux.yml; a repository that keeps it as
+# .github/linux.example.yml publishes it there with scripts/export-public.sh.
+#
+# The suites were written on a Mac and are proven there (.github/workflows/ci.yml runs
+# them on every push). Some still use macOS-only commands, so this run is expected to
+# fail in places. It is kept out of the automatic run so a known failure does not mark
+# every commit. Once it passes, move ubuntu-latest into ci.yml's test matrix.
+name: checks on Linux
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: test (Linux, ${{ matrix.shard }}/4)
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [1, 2, 3, 4]
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      # The same split and the same loop as ci.yml: every suite, this job's quarter of them.
+      - name: Test suites
+        run: |
+          failed=""
+          for suite in $(node scripts/ci-shard.mjs ${{ matrix.shard }} 4); do
+            echo "::group::npm run $suite"
+            npm run --silent "$suite" || failed="$failed $suite"
+            echo "::endgroup::"
+          done
+          if [ -n "$failed" ]; then echo "::error::These suites failed:$failed"; exit 1; fi

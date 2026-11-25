@@ -1,0 +1,21 @@
+# The fleet's server list. Copy this file to scripts/servers.local (one checkout)
+# or to ~/.config/fleet/servers (every checkout on this machine) and replace the
+# lines below with your own servers. `npm run servers:export` writes it for you
+# from the dashboard's database.
+#
+#   <ip address>|<GridPane server id>|<label>
+#
+# The id is the number GridPane gives the server; the label is the server's name
+# in GridPane. Add |golden to the ONE server the install scripts copy their
+# known-good files from.
+#
+# Your SSH key: before connecting, the scripts check that your ssh-agent holds
+# the key the servers accept. Name that key by its fingerprint (`ssh-add -l`
+# prints it, the part that starts SHA256:) in ~/.config/fleet/ssh-key-fingerprint,
+# or in $FLEET_SSH_KEY_FP. With neither set, any key the agent holds will do.
+#
+# These addresses are examples (they are reserved for documentation and reach
+# nothing).
+203.0.113.10|10001|web1|golden
+203.0.113.11|10002|web2
+203.0.113.12|10003|shop1

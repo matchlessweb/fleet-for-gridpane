@@ -1,0 +1,71 @@
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
+# dependencies
+/node_modules
+/.pnp
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/versions
+
+# testing
+/coverage
+
+# next.js
+/.next/
+/out/
+
+# production
+/build
+
+# misc
+.DS_Store
+*.pem
+build.log
+
+# local secrets / seed data (not for version control)
+supabase_seed.sql
+
+# local working notes / session logs (kept out of the repo)
+tasks/
+
+# debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# env files (can opt-in for committing if needed)
+.env*
+!.env.example
+
+# vercel
+.vercel
+
+# typescript
+*.tsbuildinfo
+next-env.d.ts
+
+# cloudflare / opennext
+.open-next/
+.dev.vars
+cloudflare-env.d.ts
+.wrangler/
+.claude/
+
+# TestSprite's local output: the tests it writes and its scratch folder
+testsprite_tests/
+
+# The real server list (see scripts/lib-fleet-servers.sh)
+scripts/servers.local
+
+# the Supabase CLI's own notes about the linked project
+supabase/.temp/
+
+# Patchstack credential — never commit this
+.patchstackrc.local.json
+
+# Patchstack local runtime cache
+.patchstack/
