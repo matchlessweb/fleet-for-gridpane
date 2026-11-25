@@ -41,9 +41,15 @@ dashboard does, through GridPane's public API, and that API is rate limited: abo
 route. A sync reads one site about every 11 seconds (about 18 minutes for 100 sites), and a bulk PHP change waits
 35 seconds between sites. For many everyday tasks, GridPane's own dashboard is still the faster place to work.
 
-Where Fleet earns its place is on a phone, and in what GridPane's dashboard does not show: live load, memory and
+Where Fleet earns its place today is on a phone, and in what GridPane's dashboard does not show: live load, memory and
 disk from its own agent on each server, how full each PHP version's code cache is, 7G and 8G block counts, Fail2Ban's
 jails and bans, each Cloudflare zone's WAF rules, and backup schedules that start in the same slot.
+
+**GridPane's own dashboard is being redesigned.** GridPane has shown a first look at a new dashboard that is due to
+roll out soon. Fleet is not meant to compete with it or replace it. Some tasks will still be faster there, and the new
+dashboard may well suit a phone too, which may leave Fleet less useful to you. Fleet is the author's own take on a
+GridPane dashboard, built for the author's needs and shared in case other GridPane users find it useful alongside
+GridPane's own.
 
 What it does not do:
 
